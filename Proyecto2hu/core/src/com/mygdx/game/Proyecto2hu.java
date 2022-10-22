@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 
@@ -13,14 +14,19 @@ public class Proyecto2hu extends ApplicationAdapter
 	private SpriteBatch batch;
 	Texture img;
 	
+	private BitmapFont font;
+	
 	private CharacterPlayer player;
 	
 	@Override
 	public void create ()
 	{
+		font = new BitmapFont();
+		
 		//entity creation
-		player = new CharacterPlayer (new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
-				"Youmu");
+		player = new CharacterPlayer (new Texture(Gdx.files.internal("ch14.png")),
+				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
+				 "Youmu");
 		
 		camera = new OrthographicCamera();
 	    camera.setToOrtho(false, 800, 480);
@@ -39,10 +45,14 @@ public class Proyecto2hu extends ApplicationAdapter
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		
+		font.draw(batch, "Vida : " + player.getHealth(), 720, 475);
+		font.draw(batch, "Estado : " + player.getCharacterState(), 720, 470);
+		
 		player.controlCharacterPlayer();
 		player.renderFrame(batch);
 		
 		//player.debugHitboxViewerRender();	//debug
+		//player.debugSwordHitboxViewerRender();
 		batch.end();
 	}
 	

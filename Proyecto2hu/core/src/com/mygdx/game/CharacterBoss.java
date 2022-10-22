@@ -21,11 +21,9 @@ public class CharacterBoss extends Character
 		super(sprite, name, health);
 	}
 	
-	public Rectangle createSwordHitbox()
+	public void createSwordHitbox()
 	{
 		Rectangle hitbox = new Rectangle();
-		
-		return hitbox;
 	}
 
 	public void move()

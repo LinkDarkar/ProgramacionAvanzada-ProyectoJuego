@@ -14,8 +14,8 @@ public abstract class Entity
 	//igual tener otro que no reciba nada??
 	public Entity (Texture sprite)
 	{
-		//this.shapeRenderer = new ShapeRenderer();	//Debug
-		//this.shapeRenderer.setAutoShapeType(true);	//Debug
+		this.shapeRenderer = new ShapeRenderer();	//Debug
+		this.shapeRenderer.setAutoShapeType(true);	//Debug
 		this.hitbox = this.createHitbox();
 		this.sprite = sprite;
 	}
@@ -36,8 +36,12 @@ public abstract class Entity
 	/**********************DEBUG****************************/
 	public void debugHitboxViewerRender ()
 	{
-	    this.shapeRenderer.begin();
-	    this.shapeRenderer.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
-	    this.shapeRenderer.end();
+	    //this.shapeRenderer.begin();
+	    //this.shapeRenderer.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
+	    //this.shapeRenderer.end();
+	}
+	public ShapeRenderer getShapeRenderer()
+	{
+		return this.shapeRenderer;
 	}
 }

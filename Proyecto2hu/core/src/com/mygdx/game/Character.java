@@ -3,12 +3,16 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character extends Entity implements Movement
 {
+	private Animation animation;
+	
 	private String name;	//no se va a usar
 	private int health;		//vida: si es <= 0 se muere
 	private int posture;	//por si el combate está muy fácil, empezaría en 0
@@ -21,6 +25,7 @@ public abstract class Character extends Entity implements Movement
 	{
 		idle,
 		attacking,
+		attackInCooldown,
 		blocking,
 		deflecting,
 		inKnockback,
@@ -31,7 +36,7 @@ public abstract class Character extends Entity implements Movement
 	private boolean facingRight;
 	private int xvel;
 	
-	public Character (Texture sprite, String name, int health, int posture)
+	public Character (Texture spriteTable, Texture sprite, String name, int health, int posture)
 	{
 		super(sprite);
 		this.name = name;	//esto esta malo
@@ -40,7 +45,7 @@ public abstract class Character extends Entity implements Movement
 		this.facingRight = true;
 		this.xvel = 250;
 		
-		this.swordHitbox = createSwordHitbox();
+		createSwordHitbox();
 	}
 	
 	//porque la postura siempre empezará en 0
@@ -54,8 +59,13 @@ public abstract class Character extends Entity implements Movement
 		this.xvel = 600;
 	}
 	
-	public abstract Rectangle createSwordHitbox ();
+	//implementar esto en Character porque puede que no haga nada
+	public abstract void createSwordHitbox ();
 	
+	public int getHealth()
+	{
+		return this.health;
+	}
 	public int getDamage()
 	{
 		return this.damage;
@@ -68,29 +78,55 @@ public abstract class Character extends Entity implements Movement
 	{
 		return this.characterState;
 	}
+	public boolean getFacingRight()
+	{
+		return this.facingRight;
+	}
+	public float getPosx()
+	{
+		return getHitbox().x;
+	}
+	public float getPosy()
+	{
+		return getHitbox().y;
+	}
 	
 	public void setXvel (int newVel)
 	{
 		this.xvel = newVel;
 	}
+	public void setCharacterState (CharacterState characterState)
+	{
+		this.characterState = characterState;
+	}
+	public void setSwordHitbox (Rectangle swordHitbox)
+	{
+		this.swordHitbox = swordHitbox;
+	}
 	
 	/**********************MOVIEMIENTO****************************/
 	public void moveLeft ()
 	{
+		this.facingRight = false;
 		getHitbox().x -= this.xvel * Gdx.graphics.getDeltaTime();
+		//this.swordHitbox.x -= this.xvel * Gdx.graphics.getDeltaTime();
 	}
 	public void moveRight ()
 	{
+		this.facingRight = true;
 		getHitbox().x += this.xvel * Gdx.graphics.getDeltaTime();
+		//this.swordHitbox.x += this.xvel * Gdx.graphics.getDeltaTime();
 	}
 	//para cantidades específicas
 	public void moveLeft (int xvel)
 	{
 		getHitbox().x -= xvel * Gdx.graphics.getDeltaTime();
+		
 	}
 	public void moveRight (int xvel)
 	{
 		getHitbox().x += xvel * Gdx.graphics.getDeltaTime();
+		
 	}
 	
 	/**********************COMBATE****************************/
@@ -114,10 +150,6 @@ public abstract class Character extends Entity implements Movement
 	}
 
 	/**********************ACTUALIZACION****************************/
-	public void updateMovement()
-	{
-		
-	}
 	public void renderFrame (SpriteBatch batch)
 	{
 		if (characterState == CharacterState.inKnockback)
@@ -134,8 +166,24 @@ public abstract class Character extends Entity implements Movement
 				moveRight();
 			}
 		}
+		if (characterState == CharacterState.attacking)
+		{
+			attack();
+		}
+		
+
+		
+		swordHitbox.x = facingRight ? getPosx() + 40 : getPosx() - 40;
+		swordHitbox.y = getPosy();
 		
 		batch.draw(getSprite(), getHitbox().x, getHitbox().y);
 	}
 	
+	/**********************Debug****************************/
+	public void debugSwordHitboxViewerRender ()
+	{
+	    this.getShapeRenderer().begin();
+	    this.getShapeRenderer().rect(swordHitbox.getX(), swordHitbox.getY(), swordHitbox.getWidth(), swordHitbox.getHeight());
+	    this.getShapeRenderer().end();
+	}
 }

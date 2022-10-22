@@ -3,10 +3,12 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 public class CharacterPlayer extends Character
-{
+{	
 	private int blockingStateVelocity;
 	private int blockingStateVelocityTimer;	//el tiempo en que se ralentiza el movimiento
 	
@@ -14,16 +16,20 @@ public class CharacterPlayer extends Character
 	private int knockbackTimerDefault = 60;
 	private int stunTimer;
 	private int stunTimerDefault = 60;
-	private int attackCooldown;
-	private int attackCooldownDefault = 60;
+	private int attackCooldownTimer;
+	private int attackCooldownTimerDefault = 10;
+	private int attackMovementTimer;
+	private int attackMovementTimerDefault = 5;
 	private int deflectCooldown;
 	private int deflectCooldownDefault = 60;
 	private int dashCooldown;
 	private int dashCooldownDefault = 60;
+	
+	private boolean attackInCooldown = false;
 
-	public CharacterPlayer (Texture sprite, String name)
+	public CharacterPlayer (Texture spriteTable, Texture sprite, String name)
 	{
-		super(sprite, name, 5, 0);
+		super(spriteTable, sprite, name, 5, 0);
 	}
 	public Rectangle createHitbox ()
 	{
@@ -35,50 +41,76 @@ public class CharacterPlayer extends Character
 		
 		return hitbox;
 	}
-	public Rectangle createSwordHitbox ()
+	public void createSwordHitbox ()
 	{
 		//esto hará que el jugador haga daño conforme toque las cosas?
-		Rectangle hitbox = new Rectangle();
-		hitbox.height = 64;
-		hitbox.width = 64;
-		hitbox.x = 0;
-		hitbox.y = 0;
+		Rectangle swordHitbox = new Rectangle();
+		swordHitbox.height = 64;
+		swordHitbox.width = 64;
+		swordHitbox.x = getPosx()+10;
+		swordHitbox.y = getPosy()+10;
 		
-		return hitbox;
+		setSwordHitbox(swordHitbox);
 	}
-	
 	
 	public void controlCharacterPlayer ()
 	{
-		//cuando se quiera cambiar de dirección, la reacción debe ser casi INSTANTÁNEA
-		//tengo mis dudas de si esta implementación cumple con ese requisito
 		if (getCharacterState() == CharacterState.idle)
 		{
-			if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
+			if(Gdx.input.isKeyPressed(Input.Keys.LEFT)&& attackInCooldown == false)
 			{
 				moveLeft();
 			}
-			if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+			if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)&& attackInCooldown == false)
 			{
 				moveRight();
 			}
+			if(Gdx.input.isKeyJustPressed(Input.Keys.Z) && attackInCooldown == false)
+			{
+				attackInCooldown = true;
+				setCharacterState(CharacterState.attacking);
+				attack();
+			}
+		}
+		if (attackInCooldown == true)
+		{
+			attackInCooldown = attackCooldownCheck();
 		}
 		
 		if(getHitbox().x < 0) getHitbox().x = 0;
 		if(getHitbox().x > 800 - 64) getHitbox().x = 800 - 64;
 	}
 
-	public void attack (CharacterState CharacterState)
+	public void attack ()
 	{
-		//HAY QUE VER CUANTOS FRAMES VA A DURAR ESTO
-		if(Gdx.input.isKeyPressed(Input.Keys.Z))
+		if (attackMovementTimer < attackMovementTimerDefault)
 		{
-			//tiene que haber un cambio en el movimiento, se corta, y va hacia adelante a una velocidad distinta a la que se mueve
-			setXvel(0);
-			getHitbox().x += getXvel() * Gdx.graphics.getDeltaTime();
-			//igual meter un ciclo para mantenerlo ahí por ciertos frames?
-			CharacterState = CharacterState.attacking;
+			if (getFacingRight())
+			{
+				//getHitbox().x += 100 * Gdx.graphics.getDeltaTime();
+			}
+			else
+			{
+				//getHitbox().x -= 100 * Gdx.graphics.getDeltaTime();
+			}
+			attackMovementTimer += 1;
 		}
+		else
+		{
+			setCharacterState(CharacterState.idle);
+			attackMovementTimer = 0;
+		}
+	}
+	public boolean attackCooldownCheck ()
+	{
+		attackCooldownTimer += 1;
+		if (attackCooldownTimer >= attackCooldownTimerDefault)
+		{
+			attackCooldownTimer = 0;
+			return false;
+		}
+		
+		return true;
 	}
 
 	public void blockOrDeflect (CharacterState CharacterState)
@@ -93,12 +125,6 @@ public class CharacterPlayer extends Character
 	}
 
 
-
-	public void attack()
-	{
-		// TODO Auto-generated method stub
-		
-	}
 	public void blockOrDeflect()
 	{
 		// TODO Auto-generated method stub
