@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class CharacterPlayer extends Character
 {
+	private int blockingStateVelocity;
+	private int blockingStateVelocityTimer;	//el tiempo en que se ralentiza el movimiento
+	
 	private int knockbackTimer;
 	private int knockbackTimerDefault = 60;
 	private int stunTimer;
@@ -18,17 +21,38 @@ public class CharacterPlayer extends Character
 	private int dashCooldown;
 	private int dashCooldownDefault = 60;
 
-	public CharacterPlayer (Rectangle hitbox, Texture sprite, Rectangle swordHitbox, String name, int health, int posture)
+	public CharacterPlayer (Texture sprite, String name)
 	{
-		super(hitbox, sprite, swordHitbox, name, health, posture);
+		super(sprite, name, 5, 0);
 	}
-
+	public Rectangle createHitbox ()
+	{
+		Rectangle hitbox = new Rectangle();
+		hitbox.height = 64;
+		hitbox.width = 64;
+		hitbox.x = 0;
+		hitbox.y = 0;
+		
+		return hitbox;
+	}
+	public Rectangle createSwordHitbox ()
+	{
+		//esto hará que el jugador haga daño conforme toque las cosas?
+		Rectangle hitbox = new Rectangle();
+		hitbox.height = 64;
+		hitbox.width = 64;
+		hitbox.x = 0;
+		hitbox.y = 0;
+		
+		return hitbox;
+	}
+	
 	
 	public void controlCharacterPlayer ()
 	{
 		//cuando se quiera cambiar de dirección, la reacción debe ser casi INSTANTÁNEA
 		//tengo mis dudas de si esta implementación cumple con ese requisito
-		if (getSwordState() == SwordState.idle)
+		if (getCharacterState() == CharacterState.idle)
 		{
 			if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
 			{
@@ -39,9 +63,12 @@ public class CharacterPlayer extends Character
 				moveRight();
 			}
 		}
+		
+		if(getHitbox().x < 0) getHitbox().x = 0;
+		if(getHitbox().x > 800 - 64) getHitbox().x = 800 - 64;
 	}
 
-	public void attack (SwordState swordState)
+	public void attack (CharacterState CharacterState)
 	{
 		//HAY QUE VER CUANTOS FRAMES VA A DURAR ESTO
 		if(Gdx.input.isKeyPressed(Input.Keys.Z))
@@ -50,20 +77,21 @@ public class CharacterPlayer extends Character
 			setXvel(0);
 			getHitbox().x += getXvel() * Gdx.graphics.getDeltaTime();
 			//igual meter un ciclo para mantenerlo ahí por ciertos frames?
-			swordState = SwordState.attacking;
+			CharacterState = CharacterState.attacking;
 		}
 	}
 
-	public void blockOrDeflect (SwordState swordState)
+	public void blockOrDeflect (CharacterState CharacterState)
 	{
 		if(Gdx.input.isKeyPressed(Input.Keys.X))
 		{
 			//tiene que haber un cambio en el movimiento, se corta, y va hacia adelante a una velocidad distinta a la que se mueve
 			getHitbox().x -= getXvel() * Gdx.graphics.getDeltaTime();
 			//igual meter un ciclo para mantenerlo ahí por ciertos frames?
-			swordState = SwordState.deflecting;
+			CharacterState = CharacterState.deflecting;
 		}
 	}
+
 
 
 	public void attack()

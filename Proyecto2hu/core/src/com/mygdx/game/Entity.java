@@ -3,16 +3,20 @@ package com.mygdx.game;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public abstract class Entity
 {
+	private ShapeRenderer shapeRenderer;	//Debug
 	private Rectangle hitbox;
 	private Texture sprite;
 	
 	//igual tener otro que no reciba nada??
-	public Entity (Rectangle hitbox, Texture sprite)
+	public Entity (Texture sprite)
 	{
-		this.hitbox = hitbox;
+		//this.shapeRenderer = new ShapeRenderer();	//Debug
+		//this.shapeRenderer.setAutoShapeType(true);	//Debug
+		this.hitbox = this.createHitbox();
 		this.sprite = sprite;
 	}
 	
@@ -25,7 +29,15 @@ public abstract class Entity
 		return this.sprite;
 	}
 	
-	public abstract void renderFrame();
+	public abstract Rectangle createHitbox();
+	public abstract void renderFrame(SpriteBatch batch);
 	public abstract void getHit ();
-	public abstract void draw (SpriteBatch batch);
+	
+	/**********************DEBUG****************************/
+	public void debugHitboxViewerRender ()
+	{
+	    this.shapeRenderer.begin();
+	    this.shapeRenderer.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
+	    this.shapeRenderer.end();
+	}
 }

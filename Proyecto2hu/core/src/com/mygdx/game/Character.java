@@ -4,9 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
-public abstract class Character extends Entity
+public abstract class Character extends Entity implements Movement
 {
 	private String name;	//no se va a usar
 	private int health;		//vida: si es <= 0 se muere
@@ -15,8 +16,8 @@ public abstract class Character extends Entity
 	
 	private Rectangle swordHitbox;						//registra las coordenadas de la hitbox de la espada
 	//cambiar nombre por CharacterState o State, el que quede mas guapo
-	private SwordState swordState = SwordState.idle;	//indica lo que hará la hitbox de la espada cuando colisione contra algo
-	public enum SwordState
+	private CharacterState characterState = CharacterState.idle;	//indica lo que hará la hitbox de la espada cuando colisione contra algo
+	public enum CharacterState
 	{
 		idle,
 		attacking,
@@ -30,22 +31,22 @@ public abstract class Character extends Entity
 	private boolean facingRight;
 	private int xvel;
 	
-
-	
-	public Character (Rectangle hitbox, Texture sprite, Rectangle swordHitbox, String name, int health, int posture)
+	public Character (Texture sprite, String name, int health, int posture)
 	{
-		super(hitbox,sprite);
+		super(sprite);
 		this.name = name;	//esto esta malo
 		this.health = health;
 		this.posture = posture;
 		this.facingRight = true;
-		this.xvel = 600;
+		this.xvel = 250;
+		
+		this.swordHitbox = createSwordHitbox();
 	}
 	
 	//porque la postura siempre empezará en 0
-	public Character (Rectangle hitbox, Texture sprite, Rectangle swordHitbox, String name, int health)
+	public Character (Texture sprite, String name, int health)
 	{
-		super(hitbox,sprite);
+		super(sprite);
 		this.name = name;	//esto esta malo
 		this.health = health;
 		this.posture = 0;
@@ -53,23 +54,7 @@ public abstract class Character extends Entity
 		this.xvel = 600;
 	}
 	
-	public void renderFrame ()
-	{
-		if (swordState == SwordState.inKnockback)
-		{
-			//
-			if (facingRight == true)
-			{
-				//falta valor
-				moveLeft();
-			}
-			else
-			{
-				//falta valor
-				moveRight();
-			}
-		}
-	}
+	public abstract Rectangle createSwordHitbox ();
 	
 	public int getDamage()
 	{
@@ -79,9 +64,9 @@ public abstract class Character extends Entity
 	{
 		return this.xvel;
 	}
-	public SwordState getSwordState()
+	public CharacterState getCharacterState()
 	{
-		return this.swordState;
+		return this.characterState;
 	}
 	
 	public void setXvel (int newVel)
@@ -89,6 +74,7 @@ public abstract class Character extends Entity
 		this.xvel = newVel;
 	}
 	
+	/**********************MOVIEMIENTO****************************/
 	public void moveLeft ()
 	{
 		getHitbox().x -= this.xvel * Gdx.graphics.getDeltaTime();
@@ -107,6 +93,7 @@ public abstract class Character extends Entity
 		getHitbox().x += xvel * Gdx.graphics.getDeltaTime();
 	}
 	
+	/**********************COMBATE****************************/
 	public abstract void attack ();
 	//igual el de abajo debería de ser un boolean para que si retorna false recibe un golpe
 	public abstract void blockOrDeflect ();
@@ -126,8 +113,29 @@ public abstract class Character extends Entity
 		//knockback???
 	}
 
-	public void draw (SpriteBatch batch)
+	/**********************ACTUALIZACION****************************/
+	public void updateMovement()
 	{
+		
+	}
+	public void renderFrame (SpriteBatch batch)
+	{
+		if (characterState == CharacterState.inKnockback)
+		{
+			//
+			if (facingRight == true)
+			{
+				//falta valor
+				moveLeft();
+			}
+			else
+			{
+				//falta valor
+				moveRight();
+			}
+		}
+		
 		batch.draw(getSprite(), getHitbox().x, getHitbox().y);
 	}
+	
 }

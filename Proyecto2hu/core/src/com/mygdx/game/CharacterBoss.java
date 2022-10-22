@@ -18,7 +18,14 @@ public class CharacterBoss extends Character
 	
 	public CharacterBoss(Rectangle hitbox, Texture sprite, Rectangle swordHitbox, String name, int health)
 	{
-		super(hitbox, sprite, swordHitbox, name, health);
+		super(sprite, name, health);
+	}
+	
+	public Rectangle createSwordHitbox()
+	{
+		Rectangle hitbox = new Rectangle();
+		
+		return hitbox;
 	}
 
 	public void move()
@@ -46,10 +53,16 @@ public class CharacterBoss extends Character
 		
 	}
 
-	@Override
-	public void draw() {
+	public void draw()
+	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Rectangle createHitbox() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 
