@@ -27,6 +27,8 @@ public class Proyecto2hu extends ApplicationAdapter
 		player = new CharacterPlayer (new Texture(Gdx.files.internal("ch14.png")),
 				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
 				 "Youmu");
+		player.createTestAttackAnimation();//prueba animacion de ataque
+		player.createDeflectAnimation();
 		
 		camera = new OrthographicCamera();
 	    camera.setToOrtho(false, 800, 480);
@@ -46,9 +48,9 @@ public class Proyecto2hu extends ApplicationAdapter
 		batch.begin();
 		
 		font.draw(batch, "Vida : " + player.getHealth(), 720, 475);
-		font.draw(batch, "Estado : " + player.getCharacterState(), 720, 470);
+		font.draw(batch, "Estado : " + player.getCharacterState(), 700, 450);
 		
-		player.controlCharacterPlayer();
+		player.controlCharacterPlayer(batch);
 		player.renderFrame(batch);
 		
 		//player.debugHitboxViewerRender();	//debug

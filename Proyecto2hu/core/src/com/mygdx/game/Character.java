@@ -43,7 +43,7 @@ public abstract class Character extends Entity implements Movement
 		this.health = health;
 		this.posture = posture;
 		this.facingRight = true;
-		this.xvel = 250;
+		this.xvel = 120;
 		
 		createSwordHitbox();
 	}
@@ -121,16 +121,15 @@ public abstract class Character extends Entity implements Movement
 	public void moveLeft (int xvel)
 	{
 		getHitbox().x -= xvel * Gdx.graphics.getDeltaTime();
-		
 	}
 	public void moveRight (int xvel)
 	{
 		getHitbox().x += xvel * Gdx.graphics.getDeltaTime();
-		
 	}
 	
 	/**********************COMBATE****************************/
-	public abstract void attack ();
+	public abstract void attack (SpriteBatch batch);
+	public abstract void deflect (SpriteBatch batch);
 	//igual el de abajo debería de ser un boolean para que si retorna false recibe un golpe
 	public abstract void blockOrDeflect ();
 
@@ -154,7 +153,6 @@ public abstract class Character extends Entity implements Movement
 	{
 		if (characterState == CharacterState.inKnockback)
 		{
-			//
 			if (facingRight == true)
 			{
 				//falta valor
@@ -168,15 +166,20 @@ public abstract class Character extends Entity implements Movement
 		}
 		if (characterState == CharacterState.attacking)
 		{
-			attack();
+			attack(batch);
 		}
-		
-
+		if (characterState == CharacterState.idle)
+		{
+			batch.draw(getSprite(), getHitbox().x, getHitbox().y);
+		}
+		if (characterState == CharacterState.deflecting)
+		{
+			deflect(batch);
+		}
 		
 		swordHitbox.x = facingRight ? getPosx() + 40 : getPosx() - 40;
 		swordHitbox.y = getPosy();
-		
-		batch.draw(getSprite(), getHitbox().x, getHitbox().y);
+
 	}
 	
 	/**********************Debug****************************/
