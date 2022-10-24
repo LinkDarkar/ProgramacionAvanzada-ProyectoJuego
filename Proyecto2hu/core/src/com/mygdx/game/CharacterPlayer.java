@@ -32,23 +32,28 @@ public class CharacterPlayer extends Character
 	 * */
 	private Animation<TextureRegion> attackAnimation;	//donde se guarda la animación
 	private float stateTimeAttack = 0f;			//indicará a la función el frame que tendrá que mostrar
-	private final float ATTACK_FRAME_DURATION = 0.2f;	//duración de los frames de la animación
+	private final float ATTACK_FRAME_DURATION = 0.11f;	//duración de los frames de la animación
 	private int attackCooldownTimer;
-	private int attackCooldownTimerDefault = 25;	//tarda 25 frames en poder volver a atacar
+	private int attackCooldownTimerDefault = 24;	//tarda 24 frames en poder volver a atacar
 	private int attackMovementTimer;
-	private int attackMovementTimerDefault = 25;	//tarda 25 frames en poder volver a moverse
+	private int attackMovementTimerDefault = 28;	//tarda 25 frames en poder volver a moverse
 	private boolean attackInCooldown = false;		//indica si el ataque está en cooldown
 
 	/* variables que controlan los deflects
 	 * 
+	 * el stateTimeDeflect no hace nada por el momento, ya que la función
+	 * para la renderización de esta mierda solo usa el stateTimeAttack, así que dependiendo
+	 * de las animaciónes que estemos usando, puede que queramos tener un stateTime
+	 * general o tener que pasarle a la función de la renderización el stateTime
+	 * que queremos usar
 	 * */
 	private Animation<TextureRegion> deflectAnimation;
-	private float stateTimeDeflect = 0f;
+	private float stateTimeDeflect = 0f;				//esto no hace nada por el momento
 	private final float DEFLECT_FRAME_DURATION = 1f;	//duración de los frames de la animación
 	private int deflectTime = 0;
 	private int deflectTimeDefault = 20;
 	private int deflectCooldownTimer = 0;
-	private int deflectCooldownTimerDefault = 30;
+	private int deflectCooldownTimerDefault = 37;
 	private boolean deflectInCooldown = false;
 
 	public CharacterPlayer (Texture spriteTable, Texture sprite, String name)
@@ -193,7 +198,7 @@ public class CharacterPlayer extends Character
 			else
 			{
 			}
-			deflectTime += 1;		/* esto es lo que realmente para a la animación, a ver
+			deflectTime += 1;				/* esto es lo que realmente para a la animación, a ver
 											 * podría arreglar esto para que quede más bonito, no
 											 * lo voy a hacer hoy
 											 **/

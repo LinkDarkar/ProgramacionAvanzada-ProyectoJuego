@@ -155,7 +155,6 @@ public abstract class Character extends Entity implements Movement
 		{
 			if (facingRight == true)
 			{
-				//falta valor
 				moveLeft();
 			}
 			else
