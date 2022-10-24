@@ -62,6 +62,6 @@ public class Proyecto2hu extends ApplicationAdapter
 	public void dispose ()
 	{
 		batch.dispose();
-		img.dispose();
+		//img.dispose();
 	}
 }
