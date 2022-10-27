@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
 public class Test_Screen extends ScreenBase {
-	private CharacterPlayer player;
-	private CharacterPlayer player2;
+	private CharacterPlayer<MoveSine> player;
+	private CharacterPlayer<MoveByPixel> player2;
 	private CharacterBoss enemy;
 
 	// Se ejecuta siempre que se llege a esta pantalla
@@ -14,12 +14,14 @@ public class Test_Screen extends ScreenBase {
 		super(game);		
 
 		// Creates a Player Entity
-		player = new CharacterPlayer(new Texture(Gdx.files.internal("ch14.png")),
+		player = new CharacterPlayer<MoveSine>(new Texture(Gdx.files.internal("ch14.png")),
 				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
-				 "Youmu");
-		player2 = new CharacterPlayer(new Texture(Gdx.files.internal("ch14.png")),
+				 "Youmu", new MoveSine());
+
+		player2 = new CharacterPlayer<MoveByPixel>(new Texture(Gdx.files.internal("ch14.png")),
 				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
-				 "Imu");
+				 "Imu", new MoveByPixel());
+
 		// crear enemigo
 		enemy = new CharacterBoss(new Texture(Gdx.files.internal("ch14.png")),
 				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
@@ -29,6 +31,7 @@ public class Test_Screen extends ScreenBase {
 	public void DrawSprites()
 	{
 		player.renderFrame(getBatch());
+		player2.renderFrame(getBatch());
 	}
 	
 	public void ManageFont()
@@ -41,5 +44,6 @@ public class Test_Screen extends ScreenBase {
 	public void CheckInputs()
 	{
 		player.controlCharacterPlayer(getBatch());
+		player2.controlCharacterPlayer(getBatch());
 	}
 }

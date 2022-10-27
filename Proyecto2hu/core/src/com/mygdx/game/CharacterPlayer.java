@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
-public class CharacterPlayer extends Character
+public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 {	
 	private int blockingStateVelocity;
 	private int blockingStateVelocityTimer;	//el tiempo en que se ralentiza el movimiento
@@ -57,12 +57,19 @@ public class CharacterPlayer extends Character
 	private int deflectCooldownTimerDefault = 37;
 	private boolean deflectInCooldown = false;
 
+	public CharacterPlayer (Texture spriteTable, Texture sprite, String name, Move move)
+	{
+		super(spriteTable, sprite, name, 5, 0, move);
+		createTestAttackAnimation();//prueba animacion de ataque
+		createDeflectAnimation();
+	}
 	public CharacterPlayer (Texture spriteTable, Texture sprite, String name)
 	{
 		super(spriteTable, sprite, name, 5, 0);
 		createTestAttackAnimation();//prueba animacion de ataque
 		createDeflectAnimation();
 	}
+
 	public Rectangle createHitbox ()
 	{
 		Rectangle hitbox = new Rectangle();

@@ -9,8 +9,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
-public abstract class Character extends Entity implements IMovement
+public abstract class Character<Move extends IMovement> extends Entity
 {
+	private Move move;
+
 	private Animation animation;
 	
 	private String name;	//no se va a usar
@@ -25,7 +27,6 @@ public abstract class Character extends Entity implements IMovement
 	{
 		idle,
 		attacking,
-		attackInCooldown,
 		blocking,
 		deflecting,
 		inKnockback,
@@ -36,15 +37,27 @@ public abstract class Character extends Entity implements IMovement
 	private boolean facingRight;
 	private int xvel;
 	
-	public Character (Texture spriteTable, Texture sprite, String name, int health, int posture)
+	public Character(Texture spriteTable, Texture sprite, String name, int health, int posture, Move move)
 	{
 		super(sprite);
-		this.name = name;	//esto esta malo
+		this.name = name;
 		this.health = health;
 		this.posture = posture;
 		this.facingRight = true;
 		this.xvel = 120;
-		
+		this.move = move;
+	
+		createSwordHitbox();
+	}
+	public Character(Texture spriteTable, Texture sprite, String name, int health, int posture)
+	{
+		super(sprite);
+		this.name = name;
+		this.health = health;
+		this.posture = posture;
+		this.facingRight = true;
+		this.xvel = 120;
+	
 		createSwordHitbox();
 	}
 	
@@ -52,7 +65,7 @@ public abstract class Character extends Entity implements IMovement
 	public Character (Texture sprite, String name, int health)
 	{
 		super(sprite);
-		this.name = name;	//esto esta malo
+		this.name = name;
 		this.health = health;
 		this.posture = 0;
 		this.facingRight = true;
@@ -102,31 +115,7 @@ public abstract class Character extends Entity implements IMovement
 	public void setSwordHitbox (Rectangle swordHitbox)
 	{
 		this.swordHitbox = swordHitbox;
-	}
-	
-	/**********************MOVIEMIENTO****************************/
-	public void moveLeft ()
-	{
-		this.facingRight = false;
-		getHitbox().x -= this.xvel * Gdx.graphics.getDeltaTime();
-		//this.swordHitbox.x -= this.xvel * Gdx.graphics.getDeltaTime();
-	}
-	public void moveRight ()
-	{
-		this.facingRight = true;
-		getHitbox().x += this.xvel * Gdx.graphics.getDeltaTime();
-		//this.swordHitbox.x += this.xvel * Gdx.graphics.getDeltaTime();
-	}
-	//para cantidades específicas
-	/*public void moveLeft (int xvel)
-	{
-		getHitbox().x -= xvel * Gdx.graphics.getDeltaTime();
-	}
-	public void moveRight (int xvel)
-	{
-		getHitbox().x += xvel * Gdx.graphics.getDeltaTime();
-	}*/
-	
+	}	
 	/**********************COMBATE****************************/
 	public abstract void attack (SpriteBatch batch);
 	public abstract void deflect (SpriteBatch batch);
@@ -147,6 +136,16 @@ public abstract class Character extends Entity implements IMovement
 		this.health -= 1;
 		//knockback???
 	}
+	/**********************MOVIMIENTO****************************/
+	public void moveLeft()
+	{
+		move.moveLeft(getHitbox(), xvel);
+	}
+	public void moveRight()
+	{
+		move.moveRight(getHitbox(), xvel);
+	}
+	
 
 	/**********************ACTUALIZACION****************************/
 	public void renderFrame (SpriteBatch batch)
@@ -155,12 +154,11 @@ public abstract class Character extends Entity implements IMovement
 		{
 			if (facingRight == true)
 			{
-				moveLeft();
+				move.moveLeft(getHitbox(), xvel);
 			}
 			else
 			{
-				//falta valor
-				moveRight();
+				move.moveRight(getHitbox(), xvel);
 			}
 		}
 		if (characterState == CharacterState.attacking)
@@ -178,7 +176,6 @@ public abstract class Character extends Entity implements IMovement
 		
 		swordHitbox.x = facingRight ? getPosX() + 40 : getPosX() - 40;
 		swordHitbox.y = getPosY();
-
 	}
 	
 	/**********************Debug****************************/
