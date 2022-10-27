@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class CharacterBoss extends Character
@@ -16,9 +17,9 @@ public class CharacterBoss extends Character
 	//debería tener un estado que indique si se le puede interrumpir
 	//tal que algunos ataques sean interrumpibles y otros no
 	
-	public CharacterBoss(Rectangle hitbox, Texture sprite, Rectangle swordHitbox, String name, int health)
+	public CharacterBoss(Texture spriteTable, Texture sprite, String name)
 	{
-		super(sprite, name, health);
+		super(sprite, name, 10);
 	}
 	
 	public void createSwordHitbox()
@@ -61,6 +62,18 @@ public class CharacterBoss extends Character
 	public Rectangle createHitbox() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void attack(SpriteBatch batch) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deflect(SpriteBatch batch) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

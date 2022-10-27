@@ -26,17 +26,18 @@ public class CharacterPlayer extends Character
 	 * */
 	private Texture auxTexture;						//donde se guarda el spritemap
 	TextureRegion[] auxAnimationFrames;				//donde se guardan los frames
+	private float stateTime = 0f;					//indicará al renderAnimation el frame que tiene que mostrar
 	
 	/* variables que controlan los ataques
 	 * del jugador
 	 * */
 	private Animation<TextureRegion> attackAnimation;	//donde se guarda la animación
-	private float stateTimeAttack = 0f;			//indicará a la función el frame que tendrá que mostrar
+	//private float stateTimeAttack = 0f;			//indicará a la función el frame que tendrá que mostrar
 	private final float ATTACK_FRAME_DURATION = 0.11f;	//duración de los frames de la animación
 	private int attackCooldownTimer;
 	private int attackCooldownTimerDefault = 24;	//tarda 24 frames en poder volver a atacar
 	private int attackMovementTimer;
-	private int attackMovementTimerDefault = 28;	//tarda 25 frames en poder volver a moverse
+	private int attackMovementTimerDefault = 28;	//tarda 28 frames en poder volver a moverse
 	private boolean attackInCooldown = false;		//indica si el ataque está en cooldown
 
 	/* variables que controlan los deflects
@@ -48,7 +49,7 @@ public class CharacterPlayer extends Character
 	 * que queremos usar
 	 * */
 	private Animation<TextureRegion> deflectAnimation;
-	private float stateTimeDeflect = 0f;				//esto no hace nada por el momento
+	//private float stateTimeDeflect = 0f;				//esto no hace nada por el momento
 	private final float DEFLECT_FRAME_DURATION = 1f;	//duración de los frames de la animación
 	private int deflectTime = 0;
 	private int deflectTimeDefault = 20;
@@ -59,6 +60,8 @@ public class CharacterPlayer extends Character
 	public CharacterPlayer (Texture spriteTable, Texture sprite, String name)
 	{
 		super(spriteTable, sprite, name, 5, 0);
+		createTestAttackAnimation();//prueba animacion de ataque
+		createDeflectAnimation();
 	}
 	public Rectangle createHitbox ()
 	{
@@ -107,27 +110,30 @@ public class CharacterPlayer extends Character
 		
 		deflectAnimation = new Animation<TextureRegion>(DEFLECT_FRAME_DURATION, auxAnimationFrames);
 	}
-	
-	
+
 	public void controlCharacterPlayer (SpriteBatch batch)
 	{
 		if (getCharacterState() == CharacterState.idle)
 		{
 			if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
 			{
+				stateTime = 0f;
 				moveLeft();
 			}
 			if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
 			{
+				stateTime = 0f;
 				moveRight();
 			}
 			if(Gdx.input.isKeyJustPressed(Input.Keys.Z) && attackInCooldown == false)
 			{
+				stateTime = 0f;
 				attackInCooldown = true;
 				setCharacterState(CharacterState.attacking);
 			}
 			if(Gdx.input.isKeyJustPressed(Input.Keys.X) && deflectInCooldown == false)
 			{
+				stateTime = 0f;
 				deflectInCooldown = true;
 				setCharacterState(CharacterState.deflecting);
 			}
@@ -183,7 +189,7 @@ public class CharacterPlayer extends Character
 		{
 			System.out.println("se para el estado");
 			setCharacterState(CharacterState.idle);
-			this.stateTimeAttack = 0f;
+			//this.stateTimeAttack = 0f;
 			attackMovementTimer = 0;
 		}
 	}
@@ -194,6 +200,7 @@ public class CharacterPlayer extends Character
 			System.out.println("se genera otro frame de la animacion");
 			if (getFacingRight())
 			{
+				
 			}
 			else
 			{
@@ -208,7 +215,7 @@ public class CharacterPlayer extends Character
 		{
 			System.out.println("se para el estado");
 			setCharacterState(CharacterState.idle);
-			this.stateTimeDeflect = 0f;
+			//this.stateTimeDeflect = 0f;
 			deflectTime = 0;
 		}
 	}
@@ -216,8 +223,8 @@ public class CharacterPlayer extends Character
 	public void renderAnimation(Animation<TextureRegion> animation, SpriteBatch batch)
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
-		stateTimeAttack += Gdx.graphics.getDeltaTime();
-		batch.draw(animation.getKeyFrame(stateTimeAttack, true),getPosx(),getPosy());
+		stateTime += Gdx.graphics.getDeltaTime();
+		batch.draw(animation.getKeyFrame(stateTime, true),getPosx(),getPosy());
 	}
 	
 	public boolean attackCooldownCheck ()
