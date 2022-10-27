@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Test_Screen extends ScreenBase {
 	private CharacterPlayer<MoveSine> player;
-	private CharacterPlayer<MoveByPixel> player2;
+	private CharacterPlayer<MoveCircle> player2;
 	private CharacterBoss enemy;
 
 	// Se ejecuta siempre que se llege a esta pantalla
@@ -18,9 +18,11 @@ public class Test_Screen extends ScreenBase {
 				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
 				 "Youmu", new MoveSine());
 
-		player2 = new CharacterPlayer<MoveByPixel>(new Texture(Gdx.files.internal("ch14.png")),
+		player2 = new CharacterPlayer<MoveCircle>(new Texture(Gdx.files.internal("ch14.png")),
 				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
-				 "Imu", new MoveByPixel());
+				 "Imu", new MoveCircle());
+		player2.getHitbox().x = 100;
+		player2.getHitbox().y = 100;
 
 		// crear enemigo
 		enemy = new CharacterBoss(new Texture(Gdx.files.internal("ch14.png")),
