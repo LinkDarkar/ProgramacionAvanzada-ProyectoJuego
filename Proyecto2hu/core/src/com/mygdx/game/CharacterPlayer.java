@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -33,7 +34,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	 * */
 	private Animation<TextureRegion> attackAnimation;	//donde se guarda la animación
 	//private float stateTimeAttack = 0f;			//indicará a la función el frame que tendrá que mostrar
-	private final float ATTACK_FRAME_DURATION = 0.11f;	//duración de los frames de la animación
+	private final float ATTACK_FRAME_DURATION = 0.21f;	//duración de los frames de la animación
 	private int attackCooldownTimer;
 	private int attackCooldownTimerDefault = 24;	//tarda 24 frames en poder volver a atacar
 	private int attackMovementTimer;
@@ -56,12 +57,18 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private int deflectCooldownTimer = 0;
 	private int deflectCooldownTimerDefault = 37;
 	private boolean deflectInCooldown = false;
+	
+	/* variables que controlan el andar
+	 * */
+	private Animation<TextureRegion> walkingAnimation;
+	private final float WALKING_FRAME_DURATION = 0.065f;	//duración de los frames de la animación
 
 	public CharacterPlayer (Texture spriteTable, Texture sprite, String name, Move move)
 	{
 		super(spriteTable, sprite, name, 5, 0, move);
 		createTestAttackAnimation();//prueba animacion de ataque
 		createDeflectAnimation();
+		createWalkingAnimation();
 	}
 	public CharacterPlayer (Texture spriteTable, Texture sprite, String name)
 	{
@@ -117,46 +124,79 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		
 		deflectAnimation = new Animation<TextureRegion>(DEFLECT_FRAME_DURATION, auxAnimationFrames);
 	}
+	public void createWalkingAnimation()
+	{
+		auxTexture = new Texture ("plWalking00.png");
+		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture,64,64);
+		
+		auxAnimationFrames = new TextureRegion[14];
+		for (int index = 0; index < 14; index += 1)
+		{
+			auxAnimationFrames[index] = tmpFrames[0][index];
+		}
+		
+		walkingAnimation = new Animation<TextureRegion>(WALKING_FRAME_DURATION, auxAnimationFrames);
+		walkingAnimation.setPlayMode(PlayMode.LOOP);
+	}
 
 	public void controlCharacterPlayer (SpriteBatch batch)
 	{
-		if (getCharacterState() == CharacterState.idle)
+		switch (getCharacterState())
 		{
-			if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
+			case idle:
 			{
 				stateTime = 0f;
-				moveLeft();
 			}
-			if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+			case walking:
 			{
-				stateTime = 0f;
-				moveRight();
+				if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.RIGHT)) || 
+						(Gdx.input.isKeyPressed(Input.Keys.LEFT) == false && Gdx.input.isKeyPressed(Input.Keys.RIGHT) == false))
+				{
+					setCharacterState(CharacterState.idle);
+				}
+				else
+				{
+					if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
+					{
+						setCharacterState(CharacterState.walking);
+						setFacingRight(false);
+					}
+					if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+					{
+						setCharacterState(CharacterState.walking);
+						setFacingRight(true);
+					}
+				}
+				if(Gdx.input.isKeyJustPressed(Input.Keys.Z) && attackInCooldown == false)
+				{
+					stateTime = 0f;
+					attackInCooldown = true;
+					setCharacterState(CharacterState.attacking);
+				}
+				if(Gdx.input.isKeyJustPressed(Input.Keys.X) && deflectInCooldown == false)
+				{
+					stateTime = 0f;
+					attackInCooldown = true;
+					setCharacterState(CharacterState.deflecting);
+				}
+				break;
 			}
-			if(Gdx.input.isKeyJustPressed(Input.Keys.Z) && attackInCooldown == false)
+			case attacking:
 			{
-				stateTime = 0f;
-				attackInCooldown = true;
-				setCharacterState(CharacterState.attacking);
+				//no se si deberíamos dejar lo de renderizar las animaciones en 
+				//CharacterPlayer o en Character, igual en Character queda un poco raro,
+				//pero bueno
+				//this.renderAnimation(testAttackAnimation, batch);
+				break;
 			}
-			if(Gdx.input.isKeyJustPressed(Input.Keys.X) && deflectInCooldown == false)
+			case deflecting:
 			{
-				stateTime = 0f;
-				deflectInCooldown = true;
-				setCharacterState(CharacterState.deflecting);
+				break;
 			}
-		}
-		else if (getCharacterState() == CharacterState.attacking)
-		{
-			//no se si deberíamos dejar lo de renderizar las animaciones en 
-			//CharacterPlayer o en Character, igual en Character queda un poco raro,
-			//pero bueno
-			//this.renderAnimation(testAttackAnimation, batch);
-		}
-		else if (getCharacterState() == CharacterState.deflecting)
-		{
 			
+
 		}
-		
+
 		/* dato sobre esto: como esto está en controlCharacterPlayer,
 		 * y esto no se 
 		 * 
@@ -226,12 +266,33 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 			deflectTime = 0;
 		}
 	}
+	public void walking (SpriteBatch batch)
+	{
+		if (getFacingRight() == true)
+		{
+			moveRight();
+		}
+		else
+		{
+			moveLeft();
+		}
+		/* A ver, el motivo por el que no estamos llamando al renderAnimation
+		 * e hicimos esto, es para que la velocidad de la animación dependa de la
+		 * velocidad de movimiento del personaje
+		 * 
+		 * ya se que esta feo
+		 * */
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
+		stateTime += Gdx.graphics.getDeltaTime()*((float)getXvel()/100);
+		batch.draw(walkingAnimation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
+	}
 	
 	public void renderAnimation(Animation<TextureRegion> animation, SpriteBatch batch)
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
 		stateTime += Gdx.graphics.getDeltaTime();
-		batch.draw(animation.getKeyFrame(stateTime, true),getPosX(),getPosY());
+		batch.draw(animation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
+		//spriteBatch.draw(currentFrame, flip ? x+width : x, y, flip ? -width : width, height);
 	}
 	
 	public boolean attackCooldownCheck ()

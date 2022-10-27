@@ -26,6 +26,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public enum CharacterState
 	{
 		idle,
+		walking,
 		attacking,
 		blocking,
 		deflecting,
@@ -44,7 +45,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		this.health = health;
 		this.posture = posture;
 		this.facingRight = true;
-		this.xvel = 120;
+		this.xvel = 130;
 		this.move = move;
 	
 		createSwordHitbox();
@@ -56,7 +57,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		this.health = health;
 		this.posture = posture;
 		this.facingRight = true;
-		this.xvel = 120;
+		this.xvel = 180;
 	
 		createSwordHitbox();
 	}
@@ -115,10 +116,15 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public void setSwordHitbox (Rectangle swordHitbox)
 	{
 		this.swordHitbox = swordHitbox;
-	}	
+	}
+	public void setFacingRight (boolean facingRight)
+	{
+		this.facingRight = facingRight;
+	}
 	/**********************COMBATE****************************/
 	public abstract void attack (SpriteBatch batch);
 	public abstract void deflect (SpriteBatch batch);
+	public abstract void walking (SpriteBatch batch);
 	//igual el de abajo debería de ser un boolean para que si retorna false recibe un golpe
 	public abstract void blockOrDeflect ();
 
@@ -168,6 +174,10 @@ public abstract class Character<Move extends IMovement> extends Entity
 		if (characterState == CharacterState.idle)
 		{
 			batch.draw(getSprite(), getHitbox().x, getHitbox().y);
+		}
+		if(characterState == CharacterState.walking)
+		{
+			walking(batch);
 		}
 		if (characterState == CharacterState.deflecting)
 		{
