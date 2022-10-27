@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
-public abstract class Character extends Entity implements Movement
+public abstract class Character extends Entity implements IMovement
 {
 	private Animation animation;
 	
@@ -82,11 +82,11 @@ public abstract class Character extends Entity implements Movement
 	{
 		return this.facingRight;
 	}
-	public float getPosx()
+	public float getPosX()
 	{
 		return getHitbox().x;
 	}
-	public float getPosy()
+	public float getPosY()
 	{
 		return getHitbox().y;
 	}
@@ -118,14 +118,14 @@ public abstract class Character extends Entity implements Movement
 		//this.swordHitbox.x += this.xvel * Gdx.graphics.getDeltaTime();
 	}
 	//para cantidades específicas
-	public void moveLeft (int xvel)
+	/*public void moveLeft (int xvel)
 	{
 		getHitbox().x -= xvel * Gdx.graphics.getDeltaTime();
 	}
 	public void moveRight (int xvel)
 	{
 		getHitbox().x += xvel * Gdx.graphics.getDeltaTime();
-	}
+	}*/
 	
 	/**********************COMBATE****************************/
 	public abstract void attack (SpriteBatch batch);
@@ -176,8 +176,8 @@ public abstract class Character extends Entity implements Movement
 			deflect(batch);
 		}
 		
-		swordHitbox.x = facingRight ? getPosx() + 40 : getPosx() - 40;
-		swordHitbox.y = getPosy();
+		swordHitbox.x = facingRight ? getPosX() + 40 : getPosX() - 40;
+		swordHitbox.y = getPosY();
 
 	}
 	

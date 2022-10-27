@@ -1,6 +1,6 @@
 package com.mygdx.game;
 
-public interface Movement
+public interface IMovement
 {
 	public abstract void moveLeft ();
 	public abstract void moveRight ();

@@ -79,8 +79,8 @@ public class CharacterPlayer extends Character
 		Rectangle swordHitbox = new Rectangle();
 		swordHitbox.height = 64;
 		swordHitbox.width = 64;
-		swordHitbox.x = getPosx()+10;
-		swordHitbox.y = getPosy()+10;
+		swordHitbox.x = getPosX()+10;
+		swordHitbox.y = getPosY()+10;
 		
 		setSwordHitbox(swordHitbox);
 	}
@@ -224,7 +224,7 @@ public class CharacterPlayer extends Character
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
 		stateTime += Gdx.graphics.getDeltaTime();
-		batch.draw(animation.getKeyFrame(stateTime, true),getPosx(),getPosy());
+		batch.draw(animation.getKeyFrame(stateTime, true),getPosX(),getPosY());
 	}
 	
 	public boolean attackCooldownCheck ()

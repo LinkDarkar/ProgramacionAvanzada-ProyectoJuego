@@ -17,8 +17,13 @@ public class Test_Screen extends ScreenBase {
 		player = new CharacterPlayer(new Texture(Gdx.files.internal("ch14.png")),
 				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
 				 "Youmu");
-		player = 
+		player2 = new CharacterPlayer(new Texture(Gdx.files.internal("ch14.png")),
+				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
+				 "Imu");
 		// crear enemigo
+		enemy = new CharacterBoss(new Texture(Gdx.files.internal("ch14.png")),
+				 new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
+				 "Youmu");
 	}
 
 	public void DrawSprites()
