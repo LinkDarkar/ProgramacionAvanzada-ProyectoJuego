@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,6 +15,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	private Move move;
 
 	private Animation animation;
+	private Sound hurtSound;
 	
 	private String name;	//no se va a usar
 	private int health;		//vida: si es <= 0 se muere
@@ -34,13 +36,15 @@ public abstract class Character<Move extends IMovement> extends Entity
 		iFrames
 	}
 	
-	
+	private boolean damageDone = false;
 	private boolean facingRight;
 	private int xvel;
 	
-	public Character(Texture spriteTable, Texture sprite, String name, int health, int posture, Move move)
+	public Character(Texture spriteTable, Texture sprite, Sound hurtSound, String name, int health, int posture, Move move)
 	{
 		super(sprite);
+		
+		this.hurtSound = hurtSound;
 		this.name = name;
 		this.health = health;
 		this.posture = posture;
@@ -63,14 +67,17 @@ public abstract class Character<Move extends IMovement> extends Entity
 	}
 	
 	//porque la postura siempre empezará en 0
-	public Character (Texture sprite, String name, int health)
+	public Character (Texture sprite, String name, Sound sound, int health)
 	{
 		super(sprite);
 		this.name = name;
 		this.health = health;
+		this.hurtSound = sound;
 		this.posture = 0;
-		this.facingRight = true;
+		this.facingRight = false;
 		this.xvel = 600;
+		
+		createSwordHitbox();
 	}
 	
 	//implementar esto en Character porque puede que no haga nada
@@ -84,6 +91,10 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		return this.damage;
 	}
+	public Rectangle getSwordHitbox()
+	{
+		return this.swordHitbox;
+	}
 	public int getXvel()
 	{
 		return this.xvel;
@@ -91,6 +102,10 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public CharacterState getCharacterState()
 	{
 		return this.characterState;
+	}
+	public boolean getDamageDone ()
+	{
+		return this.damageDone;
 	}
 	public boolean getFacingRight()
 	{
@@ -121,12 +136,28 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		this.facingRight = facingRight;
 	}
+	public void setDamageDone (boolean damageDone)
+	{
+		this.damageDone = damageDone;
+	}
 	/**********************COMBATE****************************/
 	public abstract void attack (SpriteBatch batch);
 	public abstract void deflect (SpriteBatch batch);
 	public abstract void walking (SpriteBatch batch);
 	//igual el de abajo debería de ser un boolean para que si retorna false recibe un golpe
 	public abstract void blockOrDeflect ();
+	public void gotHit (Character character)
+	{
+		if (character.getCharacterState() == CharacterState.attacking 
+				&& this.swordHitbox.overlaps(character.getHitbox())
+				&& character.getDamageDone() == false)
+		{
+			character.setDamageDone(true);
+			hurtSound.play(0.1f);
+			System.out.println("damageDone = true");
+			System.out.println("UWU");
+		}
+	}
 
 	public void takeKnockback (int amount)
 	{
@@ -154,8 +185,9 @@ public abstract class Character<Move extends IMovement> extends Entity
 	
 
 	/**********************ACTUALIZACION****************************/
-	public void renderFrame (SpriteBatch batch)
+	public void renderFrame (SpriteBatch batch, Character enemyCharacter)
 	{
+		gotHit(enemyCharacter);
 		if (characterState == CharacterState.inKnockback)
 		{
 			if (facingRight == true)
@@ -186,6 +218,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		
 		swordHitbox.x = facingRight ? getPosX() + 40 : getPosX() - 40;
 		swordHitbox.y = getPosY();
+		//debugSwordHitboxViewerRender();
 	}
 	
 	/**********************Debug****************************/

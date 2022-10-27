@@ -61,7 +61,7 @@ public class ScreenBase implements Screen {
 	public void render(float delta)
 	{
 		// Cambia el color de fondo (en realidad es el color del "vacio")
-		ScreenUtils.clear(0.5f, 0.5f, 0.5f, 1);
+		ScreenUtils.clear(0, 0, 0, 1);
 		
 		camera.update();
 		

@@ -1,8 +1,10 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.mygdx.game.Character.CharacterState;
 
 public class CharacterBoss extends Character
 {
@@ -17,14 +19,20 @@ public class CharacterBoss extends Character
 	//debería tener un estado que indique si se le puede interrumpir
 	//tal que algunos ataques sean interrumpibles y otros no
 	
-	public CharacterBoss(Texture spriteTable, Texture sprite, String name)
+	public CharacterBoss(Texture spriteTable, Texture sprite, Sound sound, String name)
 	{
-		super(sprite, name, 10);
+		super(sprite, name, sound, 10);
 	}
 	
 	public void createSwordHitbox()
 	{
-		Rectangle hitbox = new Rectangle();
+		Rectangle swordHitbox = new Rectangle();
+		swordHitbox.height = 64;
+		swordHitbox.width = 64;
+		swordHitbox.x = getPosX()+10;
+		swordHitbox.y = getPosY()+10;
+		
+		setSwordHitbox(swordHitbox);
 	}
 
 	public void move()
@@ -58,10 +66,15 @@ public class CharacterBoss extends Character
 		
 	}
 
-	@Override
-	public Rectangle createHitbox() {
-		// TODO Auto-generated method stub
-		return null;
+	public Rectangle createHitbox()
+	{
+		Rectangle hitbox = new Rectangle();
+		hitbox.height = 64;
+		hitbox.width = 64;
+		hitbox.x = 400;
+		hitbox.y = 0;
+		
+		return hitbox;
 	}
 
 	@Override
@@ -75,6 +88,11 @@ public class CharacterBoss extends Character
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+	@Override
+	public void walking(SpriteBatch batch) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

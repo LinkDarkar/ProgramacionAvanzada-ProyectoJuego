@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -49,6 +50,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	 * general o tener que pasarle a la función de la renderización el stateTime
 	 * que queremos usar
 	 * */
+	private Sound deflectingSound;
 	private Animation<TextureRegion> deflectAnimation;
 	//private float stateTimeDeflect = 0f;				//esto no hace nada por el momento
 	private final float DEFLECT_FRAME_DURATION = 1f;	//duración de los frames de la animación
@@ -63,9 +65,10 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private Animation<TextureRegion> walkingAnimation;
 	private final float WALKING_FRAME_DURATION = 0.065f;	//duración de los frames de la animación
 
-	public CharacterPlayer (Texture spriteTable, Texture sprite, String name, Move move)
+	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, String name, Move move)
 	{
-		super(spriteTable, sprite, name, 5, 0, move);
+		super(spriteTable, sprite, sound, name, 5, 0, move);
+		this.deflectingSound = sound2;
 		createTestAttackAnimation();//prueba animacion de ataque
 		createDeflectAnimation();
 		createWalkingAnimation();
@@ -175,6 +178,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 				}
 				if(Gdx.input.isKeyJustPressed(Input.Keys.X) && deflectInCooldown == false)
 				{
+					deflectingSound.play(0.1f);
 					stateTime = 0f;
 					attackInCooldown = true;
 					setCharacterState(CharacterState.deflecting);
@@ -193,8 +197,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 			{
 				break;
 			}
-			
-
+			default:
+				break;
 		}
 
 		/* dato sobre esto: como esto está en controlCharacterPlayer,
@@ -203,7 +207,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		 * */
 		if (attackInCooldown == true)
 		{
-			System.out.println("se entra al checkeo del cooldown del ataque");
 			attackInCooldown = attackCooldownCheck();
 		}
 		if (deflectInCooldown == true)
@@ -219,7 +222,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	{
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
-			//System.out.println("se genera otro frame de la animacion");
 			if (getFacingRight())
 			{
 			}
@@ -234,9 +236,9 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		}
 		else
 		{
-			System.out.println("se para el estado");
+			System.out.println("damageDone = false");
+			setDamageDone(false);
 			setCharacterState(CharacterState.idle);
-			//this.stateTimeAttack = 0f;
 			attackMovementTimer = 0;
 		}
 	}
@@ -244,7 +246,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	{
 		if (deflectTime < deflectTimeDefault)
 		{
-			System.out.println("se genera otro frame de la animacion");
 			if (getFacingRight())
 			{
 				
@@ -260,7 +261,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		}
 		else
 		{
-			System.out.println("se para el estado");
 			setCharacterState(CharacterState.idle);
 			//this.stateTimeDeflect = 0f;
 			deflectTime = 0;
@@ -328,9 +328,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		}
 	}
 
-
-	public void blockOrDeflect()
-	{
+	@Override
+	public void blockOrDeflect() {
 		// TODO Auto-generated method stub
 		
 	}

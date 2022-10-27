@@ -30,15 +30,15 @@ public abstract class Entity
 	}
 	
 	public abstract Rectangle createHitbox();
-	public abstract void renderFrame(SpriteBatch batch);
+	public abstract void renderFrame(SpriteBatch batch, Character character);
 	public abstract void getHit ();
 	
 	/**********************DEBUG****************************/
 	public void debugHitboxViewerRender ()
 	{
-	    //this.shapeRenderer.begin();
-	    //this.shapeRenderer.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
-	    //this.shapeRenderer.end();
+	    this.shapeRenderer.begin();
+	    this.shapeRenderer.rect(hitbox.getX(), hitbox.getY(), hitbox.getWidth(), hitbox.getHeight());
+	    this.shapeRenderer.end();
 	}
 	public ShapeRenderer getShapeRenderer()
 	{
