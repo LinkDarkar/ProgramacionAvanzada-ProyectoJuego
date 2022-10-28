@@ -12,16 +12,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 public class CharacterPlayer<Move extends IMovement> extends Character<Move>
-{	
-	private int blockingStateVelocity;
-	private int blockingStateVelocityTimer;	//el tiempo en que se ralentiza el movimiento
-	
+{
 	private int knockbackTimer;
 	private int knockbackTimerDefault = 60;
 	private int stunTimer;
 	private int stunTimerDefault = 60;
-	private int dashCooldown;
-	private int dashCooldownDefault = 60;
+	
 	
 	/* variables que formarán partes de la importación
 	 * de las animaciones
@@ -55,10 +51,16 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	//private float stateTimeDeflect = 0f;				//esto no hace nada por el momento
 	private final float DEFLECT_FRAME_DURATION = 1f;	//duración de los frames de la animación
 	private int deflectTime = 0;
-	private int deflectTimeDefault = 20;
+	private int deflectTimeDefault = 13;
 	private int deflectCooldownTimer = 0;
-	private int deflectCooldownTimerDefault = 37;
+	private int deflectCooldownTimerDefault = 20;
 	private boolean deflectInCooldown = false;
+	
+	private int dashTime = 0;
+	private int dashTimeDefault = 6;
+	private int dashCooldownTimer;
+	private int dashCooldownTimerDefault = 35;
+	private boolean dashInCooldown = false;
 	
 	/* variables que controlan el andar
 	 * */
@@ -183,6 +185,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 					attackInCooldown = true;
 					setCharacterState(CharacterState.deflecting);
 				}
+				if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT) && dashInCooldown == false)
+				{
+					dashInCooldown = true;
+					setCharacterState(CharacterState.dashing);
+				}
 				break;
 			}
 			case attacking:
@@ -213,6 +220,10 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		{
 			deflectInCooldown = deflectCooldownCheck();
 		}
+		if (dashInCooldown == true)
+		{
+			dashInCooldown = dashCooldownCheck();
+		}
 		
 		if(getHitbox().x < 0) getHitbox().x = 0;
 		if(getHitbox().x > 800 - 64) getHitbox().x = 800 - 64;
@@ -236,7 +247,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		}
 		else
 		{
-			System.out.println("damageDone = false");
 			setDamageDone(false);
 			setCharacterState(CharacterState.idle);
 			attackMovementTimer = 0;
@@ -262,8 +272,28 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		else
 		{
 			setCharacterState(CharacterState.idle);
-			//this.stateTimeDeflect = 0f;
 			deflectTime = 0;
+		}
+	}
+	public void dashing (SpriteBatch batch)
+	{
+		if (dashTime < dashTimeDefault)
+		{
+			if (getFacingRight() == true)
+			{
+				dashRight();
+			}
+			else
+			{
+				dashLeft();
+			}
+			dashTime += 1;
+			batch.draw(getSprite(), getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
+		}
+		else
+		{
+			setCharacterState(CharacterState.idle);
+			dashTime = 0;
 		}
 	}
 	public void walking (SpriteBatch batch)
@@ -292,7 +322,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
 		stateTime += Gdx.graphics.getDeltaTime();
 		batch.draw(animation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
-		//spriteBatch.draw(currentFrame, flip ? x+width : x, y, flip ? -width : width, height);
 	}
 	
 	public boolean attackCooldownCheck ()
@@ -300,7 +329,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		attackCooldownTimer += 1;
 		if (attackCooldownTimer >= attackCooldownTimerDefault)
 		{
-			System.out.println("se resetea el cooldown del ataque");
 			attackCooldownTimer = 0;
 			return false;
 		}
@@ -312,8 +340,18 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		deflectCooldownTimer += 1;
 		if (deflectCooldownTimer >= deflectCooldownTimerDefault)
 		{
-			System.out.println("se resetea el cooldown del deflect");
 			deflectCooldownTimer = 0;
+			return false;
+		}
+		
+		return true;
+	}
+	public boolean dashCooldownCheck()
+	{
+		dashCooldownTimer += 1;
+		if (dashCooldownTimer >= dashCooldownTimerDefault)
+		{
+			dashCooldownTimer = 0;
 			return false;
 		}
 		

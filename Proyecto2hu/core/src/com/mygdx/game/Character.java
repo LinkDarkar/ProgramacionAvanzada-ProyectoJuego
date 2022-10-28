@@ -33,6 +33,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		blocking,
 		deflecting,
 		inKnockback,
+		dashing,
 		iFrames
 	}
 	
@@ -144,6 +145,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public abstract void attack (SpriteBatch batch);
 	public abstract void deflect (SpriteBatch batch);
 	public abstract void walking (SpriteBatch batch);
+	public abstract void dashing (SpriteBatch batch);
 	//igual el de abajo debería de ser un boolean para que si retorna false recibe un golpe
 	public abstract void blockOrDeflect ();
 	public void gotHit (Character character)
@@ -182,7 +184,14 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		move.moveRight(getHitbox(), xvel);
 	}
-	
+	public void dashLeft()
+	{
+		move.moveLeft(getHitbox(), xvel*4);
+	}
+	public void dashRight()
+	{
+		move.moveRight(getHitbox(), xvel*4);
+	}
 
 	/**********************ACTUALIZACION****************************/
 	public void renderFrame (SpriteBatch batch, Character enemyCharacter)
@@ -214,6 +223,10 @@ public abstract class Character<Move extends IMovement> extends Entity
 		if (characterState == CharacterState.deflecting)
 		{
 			deflect(batch);
+		}
+		if (characterState == CharacterState.dashing)
+		{
+			dashing(batch);
 		}
 		
 		swordHitbox.x = facingRight ? getPosX() + 40 : getPosX() - 40;
