@@ -8,17 +8,17 @@ public class MoveSine implements IMovement {
 
 	@Override
 	public void moveLeft(Rectangle hitbox, float vel) {
-		hitbox.x -= vel * .5f * Gdx.graphics.getDeltaTime();
+		hitbox.x -= vel * Gdx.graphics.getDeltaTime();
 		hitbox.y += Math.sin(current) * .5f;
-		System.out.println("Current "+current);
+		//System.out.println("Current "+current);
 		IncreaseCurrent();
 	}
 
 	@Override
 	public void moveRight(Rectangle hitbox, float vel) {
-		hitbox.x += vel * .5f * Gdx.graphics.getDeltaTime();
+		hitbox.x += vel * Gdx.graphics.getDeltaTime();
 		hitbox.y += Math.sin(current) * .5f;
-		System.out.println("Current "+current);
+		//System.out.println("Current "+current);
 		IncreaseCurrent();
 	}
 

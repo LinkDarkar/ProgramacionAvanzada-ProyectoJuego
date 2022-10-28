@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
@@ -11,11 +12,12 @@ public class Test_Screen extends ScreenBase {
 	private CharacterPlayer<MoveByPixel> player;
 	//private CharacterPlayer<MoveCircle> player2;
 	private CharacterBoss<MoveByPixel> enemy;
-	private List<Projectile> proyectilesList;
+	private ArrayList<Projectile> projectilesList;
 	private int startingPos = 60;
 	private float timeCounter = 0;
 
 	// Se ejecuta siempre que se llege a esta pantalla
+	@SuppressWarnings("rawtypes")
 	public Test_Screen(Proyecto2hu game)
 	{
 		super(game);
@@ -28,7 +30,10 @@ public class Test_Screen extends ScreenBase {
 				new Texture(Gdx.files.internal("ch14.png")),
 				new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
 				hurtSound, deflectingSound,
-				"Youmu", Team.Player, true, new MoveByPixel());
+				"Youmu",
+				Team.Player,
+				true,
+				new MoveByPixel());
 		spawnAt(player, startingOffset, false);
 
 		//player2 = new CharacterPlayer<MoveCircle>(new Texture(Gdx.files.internal("ch14.png")),
@@ -43,14 +48,57 @@ public class Test_Screen extends ScreenBase {
 				new Texture(Gdx.files.internal("MiriamIdleAnim_0.png")),
 				23,
 				hurtSound,
-				"Miriam", Team.IA, true, new MoveByPixel());
+				"Miriam",
+				Team.IA,
+				true,
+				new MoveByPixel());
 		spawnAt(enemy, startingOffset, true);
+		
+		// Creates the new Projectiles List
+		projectilesList = new ArrayList<Projectile>();
+		
+		
+		// Creates 2 individual new projectiles to test
+		projectilesList.add(new Projectile<MoveByPixel>(
+				new Texture(Gdx.files.internal("ProjectileTest.png")),
+				Team.IA,
+				1,
+				3,
+				2,
+				false,
+				new MoveByPixel()));
+		System.out.println("Proyectile Created");
+		projectilesList.add(new Projectile<MoveSine>(
+				new Texture(Gdx.files.internal("ProjectileTest.png")),
+				Team.IA,
+				0.1f,
+				3,
+				2,
+				false,
+				new MoveSine()));
+		System.out.println("Proyectile Created");
 	}
 
 	public void DrawSprites()
 	{
 		if (player.getHealth() > 0) player.renderFrame(getBatch(), enemy);
 		if (enemy.getHealth() > 0) enemy.renderFrame(getBatch(), player);
+		for (int i = 0 ; i < projectilesList.size() ; i++)
+		{
+			Projectile<?> currentPro = projectilesList.get(i);
+			if(currentPro.checkCollision(player))
+			{
+				projectilesList.remove(i);
+				continue;
+			}
+			if(currentPro.checkCollision(enemy))
+			{
+				projectilesList.remove(i);
+				continue;
+			}
+			currentPro.renderFrame(getBatch(), null);
+			//System.out.println("Proyectile Drawn");
+		}
 		//player2.renderFrame(getBatch());
 	}
 	

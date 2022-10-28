@@ -43,6 +43,14 @@ public abstract class Entity
 	{
 		return hitbox;
 	}
+	public float getHitboxWidth()
+	{
+		return hitbox.width;
+	}
+	public float getHitboxHeight()
+	{
+		return hitbox.height;
+	}
 	public Texture getSprite ()
 	{
 		return this.sprite;

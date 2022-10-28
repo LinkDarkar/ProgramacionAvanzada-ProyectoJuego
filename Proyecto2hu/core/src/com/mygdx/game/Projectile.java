@@ -65,20 +65,31 @@ public class Projectile<Move extends IMovement> extends Entity
 	}
 
 	@Override
-	public Rectangle createHitbox() {
-		// TODO Auto-generated method stub
-		return null;
+	public Rectangle createHitbox ()
+	{
+		Rectangle hitbox = new Rectangle();
+		hitbox.height = 20;
+		hitbox.width = 20;
+		hitbox.x = 700;
+		hitbox.y = 200;
+		
+		return hitbox;
 	}
 
 	@Override
 	public void renderFrame(SpriteBatch batch, Character<?> character) {
 		if(movingRight) move.moveRight(getHitbox(), speed);
 		else move.moveLeft(getHitbox(), speed);
-		checkCollision(character);
 		batch.draw(getSprite(), getHitbox().x, getHitbox().y );
 	}
-	public void checkCollision(Character<?> character)
+	public boolean checkCollision(Character<?> character)
 	{
-		
+		if(character != null && character.getTeam() != getTeam())
+		{
+			System.out.println("Proyectile Collisioned!");
+			return true;
+		}
+		System.out.println("Proyectile DID NOT collision");
+		return false;
 	}
 }

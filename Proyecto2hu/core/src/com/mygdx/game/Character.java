@@ -281,7 +281,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 				break;
 		}
 		
-		attackHitbox.x = facingRight ? getPosX() + 40 : getPosX() - 40;
+		attackHitbox.x = facingRight ? getPosX() + getHitboxWidth() : getPosX() - attackHitbox.width;
 		attackHitbox.y = getPosY();
 		//debugSwordHitboxViewerRender();
 	}
