@@ -1,10 +1,7 @@
 package com.mygdx.game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -75,6 +72,8 @@ public class ScreenBase implements Screen {
 		batch.end();
 		
 		CheckInputs();
+		
+		//Dispose();
 	}
 
 	@Override
@@ -150,6 +149,5 @@ public class ScreenBase implements Screen {
 	{
 		GlyphLayout layout = new GlyphLayout(font, str);
 		return (getCameraHeight()/2) - (layout.height/2);
-	}
-	
+	}	
 }

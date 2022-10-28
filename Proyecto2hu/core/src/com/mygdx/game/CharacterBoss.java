@@ -4,9 +4,8 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.mygdx.game.Character.CharacterState;
 
-public class CharacterBoss extends Character
+public class CharacterBoss<Move extends IMovement> extends Character<Move>
 {
 	
 	/* TODO:
@@ -19,12 +18,21 @@ public class CharacterBoss extends Character
 	//debería tener un estado que indique si se le puede interrumpir
 	//tal que algunos ataques sean interrumpibles y otros no
 	
-	public CharacterBoss(Texture spriteTable, Texture sprite, Sound sound, String name)
+	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound, String name, Move move)
 	{
-		super(sprite, name, sound, 10);
+		super(sprite, name, sound, hp, false, move);
+	}
+	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound, String name, boolean canTakeKnockback, Move move)
+	{
+		super(sprite, name, sound, hp, canTakeKnockback, move);
+	}
+	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound, String name, Team team, boolean canTakeKnockback, Move move)
+	{
+		super(sprite, name, sound, hp, canTakeKnockback, move);
 	}
 	
-	public void createSwordHitbox()
+	
+	public void createAttackHitbox()
 	{
 		Rectangle swordHitbox = new Rectangle();
 		swordHitbox.height = 64;
@@ -32,7 +40,7 @@ public class CharacterBoss extends Character
 		swordHitbox.x = getPosX()+10;
 		swordHitbox.y = getPosY()+10;
 		
-		setSwordHitbox(swordHitbox);
+		setAttackHitbox(swordHitbox);
 	}
 
 	public void move()
@@ -49,12 +57,6 @@ public class CharacterBoss extends Character
 	}
 
 	public void blockOrDeflect()
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void getHit()
 	{
 		// TODO Auto-generated method stub
 		
@@ -91,6 +93,12 @@ public class CharacterBoss extends Character
 
 	@Override
 	public void walking(SpriteBatch batch) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dashing(SpriteBatch batch) {
 		// TODO Auto-generated method stub
 		
 	}

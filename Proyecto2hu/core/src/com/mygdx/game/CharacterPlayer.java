@@ -13,12 +13,6 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 {
-	private int knockbackTimer;
-	private int knockbackTimerDefault = 60;
-	private int stunTimer;
-	private int stunTimerDefault = 60;
-	
-	
 	/* variables que formarán partes de la importación
 	 * de las animaciones
 	 * */
@@ -67,9 +61,17 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private Animation<TextureRegion> walkingAnimation;
 	private final float WALKING_FRAME_DURATION = 0.065f;	//duración de los frames de la animación
 
-	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, String name, Move move)
+	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, String name, boolean canTakeKnockback, Move move)
 	{
-		super(spriteTable, sprite, sound, name, 5, 0, move);
+		super(spriteTable, sprite, sound, name, 5, 0, canTakeKnockback, move);
+		this.deflectingSound = sound2;
+		createTestAttackAnimation();//prueba animacion de ataque
+		createDeflectAnimation();
+		createWalkingAnimation();
+	}
+	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, String name, Team team, boolean canTakeKnockback, Move move)
+	{
+		super(spriteTable, sprite, sound, name, 5, 0, team, canTakeKnockback, move);
 		this.deflectingSound = sound2;
 		createTestAttackAnimation();//prueba animacion de ataque
 		createDeflectAnimation();
@@ -92,7 +94,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		
 		return hitbox;
 	}
-	public void createSwordHitbox ()
+	public void createAttackHitbox ()
 	{
 		//esto hará que el jugador haga daño conforme toque las cosas?
 		Rectangle swordHitbox = new Rectangle();
@@ -101,7 +103,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		swordHitbox.x = getPosX()+10;
 		swordHitbox.y = getPosY()+10;
 		
-		setSwordHitbox(swordHitbox);
+		setAttackHitbox(swordHitbox);
 	}
 	public void createTestAttackAnimation()
 	{
@@ -154,23 +156,27 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 			}
 			case walking:
 			{
-				if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.RIGHT)) || 
-						(Gdx.input.isKeyPressed(Input.Keys.LEFT) == false && Gdx.input.isKeyPressed(Input.Keys.RIGHT) == false))
-				{
-					setCharacterState(CharacterState.idle);
-				}
-				else
+				//if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.RIGHT)) || 
+				//		(Gdx.input.isKeyPressed(Input.Keys.LEFT) == false && Gdx.input.isKeyPressed(Input.Keys.RIGHT) == false))
+				
+				//el "^" es un operador llamado "XOR", el cual retorna true solo cuando una de las condiciones es True
+				//si ninguna o ambas lo son entonces retorna False
+				if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) ^ Gdx.input.isKeyPressed(Input.Keys.RIGHT)))
 				{
 					if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
 					{
 						setCharacterState(CharacterState.walking);
-						setFacingRight(false);
+						setFacingDirection(false);
 					}
 					if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
 					{
 						setCharacterState(CharacterState.walking);
-						setFacingRight(true);
+						setFacingDirection(true);
 					}
+				}
+				else
+				{
+					setCharacterState(CharacterState.idle);
 				}
 				if(Gdx.input.isKeyJustPressed(Input.Keys.Z) && attackInCooldown == false)
 				{
@@ -279,14 +285,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	{
 		if (dashTime < dashTimeDefault)
 		{
-			if (getFacingRight() == true)
-			{
-				dashRight();
-			}
-			else
-			{
-				dashLeft();
-			}
+			dash();
 			dashTime += 1;
 			batch.draw(getSprite(), getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 		}
@@ -371,5 +370,4 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		// TODO Auto-generated method stub
 		
 	}
-
 }

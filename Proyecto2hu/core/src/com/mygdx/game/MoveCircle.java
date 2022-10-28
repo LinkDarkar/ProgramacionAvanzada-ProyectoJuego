@@ -15,20 +15,20 @@ public class MoveCircle implements IMovement {
 		this.anglePerSecond = 90;
 	}
 	
-	public MoveCircle(int radius, int anglePerSecond)
+	public MoveCircle(double radius, double anglePerSecond)
 	{
 		this.radius = radius;
 		this.anglePerSecond = anglePerSecond;
 	}
 
-	public void SetCircle(int radius, int anglePerSecond)
+	public void SetCircle(double radius, double anglePerSecond)
 	{
 		this.radius = radius;
 		this.anglePerSecond = anglePerSecond;
 	}
 
 	@Override
-	public void moveLeft(Rectangle hitbox, int vel) {
+	public void moveLeft(Rectangle hitbox, float vel) {
 
 		IncreaseCurrent();
 		hitbox.x -= Math.cos(current) * radius * Gdx.graphics.getDeltaTime();
@@ -37,7 +37,7 @@ public class MoveCircle implements IMovement {
 	}
 
 	@Override
-	public void moveRight(Rectangle hitbox, int vel) {
+	public void moveRight(Rectangle hitbox, float vel) {
 		this.anglePerSecond = ((float)vel/100) * 360;
 		DecreaseCurrent();
 		hitbox.x += Math.cos(current) * radius * Gdx.graphics.getDeltaTime();

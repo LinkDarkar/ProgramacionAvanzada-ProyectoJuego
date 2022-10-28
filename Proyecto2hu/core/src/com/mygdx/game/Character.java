@@ -1,28 +1,25 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
+//import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character<Move extends IMovement> extends Entity
 {
 	private Move move;
 
-	private Animation animation;
+	//private Animation animation;
 	private Sound hurtSound;
 	
-	private String name;	//no se va a usar
+	private String nombre;	//no se va a usar
 	private int health;		//vida: si es <= 0 se muere
 	private int posture;	//por si el combate está muy fácil, empezaría en 0
 	private int damage;
 	
-	private Rectangle swordHitbox;						//registra las coordenadas de la hitbox de la espada
+	private Rectangle attackHitbox;						//registra las coordenadas de la hitbox de la espada
 	//cambiar nombre por CharacterState o State, el que quede mas guapo
 	private CharacterState characterState = CharacterState.idle;	//indica lo que hará la hitbox de la espada cuando colisione contra algo
 	public enum CharacterState
@@ -40,50 +37,92 @@ public abstract class Character<Move extends IMovement> extends Entity
 	private boolean damageDone = false;
 	private boolean facingRight;
 	private int xvel;
+	private boolean canTakeKnockback = true;
+	private float knockbackCount = 0;
+	private float knockbackSpeed = 0;
+	private boolean knockbackDirection;
 	
-	public Character(Texture spriteTable, Texture sprite, Sound hurtSound, String name, int health, int posture, Move move)
+	public Character(Texture spriteTable, Texture sprite, Sound hurtSound, String name, int health, int posture, boolean canTakeKnockback, Move move)
 	{
 		super(sprite);
 		
 		this.hurtSound = hurtSound;
-		this.name = name;
+		this.nombre = name;
 		this.health = health;
 		this.posture = posture;
 		this.facingRight = true;
 		this.xvel = 130;
+		this.canTakeKnockback = canTakeKnockback;
 		this.move = move;
 	
-		createSwordHitbox();
+		createAttackHitbox();
+	}
+	public Character(Texture spriteTable, Texture sprite, Sound hurtSound, String name, int health, int posture, Team team, boolean canTakeKnockback, Move move)
+	{
+		super(sprite, team);
+		
+		this.hurtSound = hurtSound;
+		this.nombre = name;
+		this.health = health;
+		this.posture = posture;
+		this.facingRight = true;
+		this.xvel = 130;
+		this.canTakeKnockback = canTakeKnockback;
+		this.move = move;
+	
+		createAttackHitbox();
 	}
 	public Character(Texture spriteTable, Texture sprite, String name, int health, int posture)
 	{
 		super(sprite);
-		this.name = name;
+		this.nombre = name;
 		this.health = health;
 		this.posture = posture;
 		this.facingRight = true;
 		this.xvel = 180;
+		this.canTakeKnockback = true;
 	
-		createSwordHitbox();
+		createAttackHitbox();
 	}
 	
 	//porque la postura siempre empezará en 0
 	public Character (Texture sprite, String name, Sound sound, int health)
 	{
 		super(sprite);
-		this.name = name;
+		this.nombre = name;
 		this.health = health;
 		this.hurtSound = sound;
 		this.posture = 0;
 		this.facingRight = false;
 		this.xvel = 600;
 		
-		createSwordHitbox();
+		createAttackHitbox();
 	}
 	
+	public Character(Texture sprite, String name, Sound sound, int hp, boolean canTakeKnockback, Move move) {
+		super(sprite);
+		this.nombre = name;
+		this.health = hp;
+		this.hurtSound = sound;
+		this.posture = 0;
+		this.facingRight = false;
+		this.xvel = 600;
+		this.canTakeKnockback = canTakeKnockback;
+		this.move = move;
+		
+		createAttackHitbox();
+	}
 	//implementar esto en Character porque puede que no haga nada
-	public abstract void createSwordHitbox ();
+	public abstract void createAttackHitbox ();
 	
+	public String getNombre()
+	{
+		return this.nombre;
+	}
+	public int getPosture()
+	{
+		return this.posture;
+	}
 	public int getHealth()
 	{
 		return this.health;
@@ -92,9 +131,9 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		return this.damage;
 	}
-	public Rectangle getSwordHitbox()
+	public Rectangle getAttackHitbox()
 	{
-		return this.swordHitbox;
+		return this.attackHitbox;
 	}
 	public int getXvel()
 	{
@@ -129,11 +168,11 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		this.characterState = characterState;
 	}
-	public void setSwordHitbox (Rectangle swordHitbox)
+	public void setAttackHitbox (Rectangle swordHitbox)
 	{
-		this.swordHitbox = swordHitbox;
+		this.attackHitbox = swordHitbox;
 	}
-	public void setFacingRight (boolean facingRight)
+	public void setFacingDirection (boolean facingRight)
 	{
 		this.facingRight = facingRight;
 	}
@@ -148,32 +187,51 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public abstract void dashing (SpriteBatch batch);
 	//igual el de abajo debería de ser un boolean para que si retorna false recibe un golpe
 	public abstract void blockOrDeflect ();
-	public void gotHit (Character character)
+	public void gotHit (Character<?> character)
 	{
 		if (character.getCharacterState() == CharacterState.attacking 
-				&& this.swordHitbox.overlaps(character.getHitbox())
+				&& this.attackHitbox.overlaps(character.getHitbox())
 				&& character.getDamageDone() == false)
 		{
+			this.takeDamage(2);
+			if (canTakeKnockback) takeKnockback(0.2f, 100, character.getFacingRight());
 			character.setDamageDone(true);
 			hurtSound.play(0.1f);
 			System.out.println("damageDone = true");
-			System.out.println("UWU");
 		}
 	}
 
-	public void takeKnockback (int amount)
+	public void takeKnockback(float seconds, float speed, boolean toTheRight)
 	{
+		characterState = CharacterState.inKnockback;
+		knockbackSpeed = speed;
+		knockbackCount = seconds;
+		knockbackDirection = toTheRight;
+		System.out.println("Knockback Count start: "+knockbackCount);
+	}
+	public void moveKnockback()
+	{
+		if(knockbackDirection) move.moveRight(getHitbox(), knockbackSpeed);
+		else move.moveLeft(getHitbox(), knockbackSpeed);
+		knockbackCount -= Gdx.graphics.getDeltaTime();
+		//knockbackCount = Math.max(knockbackCount - Gdx.graphics.getDeltaTime(), 0);
+		System.out.println("KB: "+knockbackCount);
 	}
 	
-	public void getHit (int damageRecieved)
+	public void takeDamage (int damageReceived)
 	{
-		this.health -= Math.max(0, damageRecieved);
-		//knockback???
+		this.health = Math.max(health - damageReceived, 0);
+		if (health <= 0)
+		{
+			System.out.println("THIS CHARACTER DIED WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!");
+			// Maybe play an animation, sound or something else
+		}
 	}
-	public void getHit ()
+	public void takeDamage ()
 	{
-		this.health -= 1;
-		//knockback???
+		this.health = Math.max(health - 1, 0);
+		if (health <= 0) System.out.println("THIS CHARACTER DIED WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!");
+		// Should end the game
 	}
 	/**********************MOVIMIENTO****************************/
 	public void moveLeft()
@@ -184,53 +242,47 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		move.moveRight(getHitbox(), xvel);
 	}
-	public void dashLeft()
+	public void dash()
 	{
-		move.moveLeft(getHitbox(), xvel*4);
-	}
-	public void dashRight()
-	{
-		move.moveRight(getHitbox(), xvel*4);
+		characterState = CharacterState.dashing;
 	}
 
 	/**********************ACTUALIZACION****************************/
-	public void renderFrame (SpriteBatch batch, Character enemyCharacter)
+	public void renderFrame (SpriteBatch batch, Character<?> enemyCharacter)
 	{
 		gotHit(enemyCharacter);
-		if (characterState == CharacterState.inKnockback)
+		switch (characterState)
 		{
-			if (facingRight == true)
-			{
-				move.moveLeft(getHitbox(), xvel);
-			}
-			else
-			{
-				move.moveRight(getHitbox(), xvel);
-			}
-		}
-		if (characterState == CharacterState.attacking)
-		{
-			attack(batch);
-		}
-		if (characterState == CharacterState.idle)
-		{
-			batch.draw(getSprite(), getHitbox().x, getHitbox().y);
-		}
-		if(characterState == CharacterState.walking)
-		{
-			walking(batch);
-		}
-		if (characterState == CharacterState.deflecting)
-		{
-			deflect(batch);
-		}
-		if (characterState == CharacterState.dashing)
-		{
-			dashing(batch);
+			case inKnockback:
+				if (knockbackCount > 0)
+				{
+					moveKnockback();
+				}
+				else characterState = CharacterState.idle;
+
+				break;
+			case attacking:
+				attack(batch);
+				break;
+			case idle:
+				batch.draw(getSprite(), getHitbox().x, getHitbox().y);
+				break;
+			case walking:
+				walking(batch);
+				break;
+			case deflecting:
+				deflect(batch);
+				break;
+			case dashing:
+				dashing(batch);
+				break;
+			default:
+				characterState = CharacterState.idle;
+				break;
 		}
 		
-		swordHitbox.x = facingRight ? getPosX() + 40 : getPosX() - 40;
-		swordHitbox.y = getPosY();
+		attackHitbox.x = facingRight ? getPosX() + 40 : getPosX() - 40;
+		attackHitbox.y = getPosY();
 		//debugSwordHitboxViewerRender();
 	}
 	
@@ -238,7 +290,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public void debugSwordHitboxViewerRender ()
 	{
 	    this.getShapeRenderer().begin();
-	    this.getShapeRenderer().rect(swordHitbox.getX(), swordHitbox.getY(), swordHitbox.getWidth(), swordHitbox.getHeight());
+	    this.getShapeRenderer().rect(attackHitbox.getX(), attackHitbox.getY(), attackHitbox.getWidth(), attackHitbox.getHeight());
 	    this.getShapeRenderer().end();
 	}
 }

@@ -10,6 +10,14 @@ public abstract class Entity
 	private ShapeRenderer shapeRenderer;	//Debug
 	private Rectangle hitbox;
 	private Texture sprite;
+	private float centerX;
+	private Team team;
+	public enum Team
+	{
+		Player,
+		IA,
+		Neutral
+	}
 	
 	//igual tener otro que no reciba nada??
 	public Entity (Texture sprite)
@@ -18,6 +26,17 @@ public abstract class Entity
 		this.shapeRenderer.setAutoShapeType(true);	//Debug
 		this.hitbox = this.createHitbox();
 		this.sprite = sprite;
+		this.centerX = hitbox.width/2;
+		this.team = Team.Neutral;
+	}
+	public Entity (Texture sprite, Team team)
+	{
+		this.shapeRenderer = new ShapeRenderer();	//Debug
+		this.shapeRenderer.setAutoShapeType(true);	//Debug
+		this.hitbox = this.createHitbox();
+		this.sprite = sprite;
+		this.centerX = hitbox.width/2;
+		this.team = team;
 	}
 	
 	public Rectangle getHitbox()
@@ -28,10 +47,19 @@ public abstract class Entity
 	{
 		return this.sprite;
 	}
+	public Team getTeam()
+	{
+		return team;
+	}
+	
+	public void moveTo(float x, float y)
+	{
+		this.hitbox.x = x - centerX;
+		this.hitbox.y = y;
+	}
 	
 	public abstract Rectangle createHitbox();
-	public abstract void renderFrame(SpriteBatch batch, Character character);
-	public abstract void getHit ();
+	public abstract void renderFrame(SpriteBatch batch, Character<?> character);
 	
 	/**********************DEBUG****************************/
 	public void debugHitboxViewerRender ()

@@ -7,7 +7,7 @@ public class MoveSine implements IMovement {
 	private double current = 0;
 
 	@Override
-	public void moveLeft(Rectangle hitbox, int vel) {
+	public void moveLeft(Rectangle hitbox, float vel) {
 		hitbox.x -= vel * .5f * Gdx.graphics.getDeltaTime();
 		hitbox.y += Math.sin(current) * .5f;
 		System.out.println("Current "+current);
@@ -15,7 +15,7 @@ public class MoveSine implements IMovement {
 	}
 
 	@Override
-	public void moveRight(Rectangle hitbox, int vel) {
+	public void moveRight(Rectangle hitbox, float vel) {
 		hitbox.x += vel * .5f * Gdx.graphics.getDeltaTime();
 		hitbox.y += Math.sin(current) * .5f;
 		System.out.println("Current "+current);
