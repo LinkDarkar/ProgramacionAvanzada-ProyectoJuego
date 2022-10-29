@@ -44,6 +44,11 @@ public class MoveCircle implements IMovement {
 		hitbox.y += Math.sin(current) * radius * Gdx.graphics.getDeltaTime();
 		System.out.println("Current "+current);
 	}
+	
+	public void continueMoving(Rectangle hitbox)
+	{
+		
+	}
 
 	private void IncreaseCurrent()
 	{

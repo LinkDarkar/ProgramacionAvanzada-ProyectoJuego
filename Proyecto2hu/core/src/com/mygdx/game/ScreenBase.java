@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -12,6 +13,7 @@ public class ScreenBase implements Screen {
 	private SpriteBatch batch;
 	private BitmapFont font;
 	private OrthographicCamera camera;
+	private Color voidColor;
 
 	public SpriteBatch getBatch() {
 		return batch;
@@ -39,12 +41,21 @@ public class ScreenBase implements Screen {
 	public Proyecto2hu getGame() {
 		return game;
 	}
+	public void setVoidColor(Color newColor)
+	{
+		this.voidColor = newColor;
+	}
+	public Color getVoidColor()
+	{
+		return this.voidColor;
+	}
 
 	// Se ejecuta siempre que se llege a esta pantalla
 	public ScreenBase(Proyecto2hu game) {
 		this.game = game;
         this.batch = game.getBatch();
         this.font = game.getFont();
+        this.voidColor = new Color(0.2f,0.2f,0.2f,1);
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
 	}
@@ -58,7 +69,7 @@ public class ScreenBase implements Screen {
 	public void render(float delta)
 	{
 		// Cambia el color de fondo (en realidad es el color del "vacio")
-		ScreenUtils.clear(0, 0, 0, 1);
+		ScreenUtils.clear(voidColor);
 		
 		camera.update();
 		

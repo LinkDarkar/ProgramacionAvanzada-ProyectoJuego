@@ -159,6 +159,10 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		return getHitbox().y;
 	}
+	public Move getMove()
+	{
+		return move;
+	}
 	
 	public void setXvel (int newVel)
 	{
@@ -193,11 +197,20 @@ public abstract class Character<Move extends IMovement> extends Entity
 				&& this.attackHitbox.overlaps(character.getHitbox())
 				&& character.getDamageDone() == false)
 		{
-			this.takeDamage(2);
-			if (canTakeKnockback) takeKnockback(0.2f, 100, character.getFacingRight());
-			character.setDamageDone(true);
-			hurtSound.play(0.1f);
-			System.out.println("damageDone = true");
+			if(getCharacterState() != CharacterState.deflecting)
+			{
+				this.takeDamage(2);
+				if (canTakeKnockback) takeKnockback(0.2f, 100, character.getFacingRight());
+				character.setDamageDone(true);
+				hurtSound.play(0.1f);
+				System.out.println("damageDone = true");
+			}
+			else
+			{
+				character.takeKnockback(0.1f, 10, character.getFacingRight());
+				System.out.println("PARRY");
+				// SONIDO DE PARRY
+			}
 		}
 	}
 
@@ -207,7 +220,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		knockbackSpeed = speed;
 		knockbackCount = seconds;
 		knockbackDirection = toTheRight;
-		System.out.println("Knockback Count start: "+knockbackCount);
+		//System.out.println("Knockback Count start: "+knockbackCount);
 	}
 	public void moveKnockback()
 	{
@@ -215,7 +228,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		else move.moveLeft(getHitbox(), knockbackSpeed);
 		knockbackCount -= Gdx.graphics.getDeltaTime();
 		//knockbackCount = Math.max(knockbackCount - Gdx.graphics.getDeltaTime(), 0);
-		System.out.println("KB: "+knockbackCount);
+		//System.out.println("KB: "+knockbackCount);
 	}
 	
 	public void takeDamage (int damageReceived)

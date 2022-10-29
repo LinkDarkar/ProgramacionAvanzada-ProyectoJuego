@@ -77,6 +77,14 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		createDeflectAnimation();
 		createWalkingAnimation();
 	}
+	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, String name, int hp, Team team, boolean canTakeKnockback, Move move)
+	{
+		super(spriteTable, sprite, sound, name, hp, 0, team, canTakeKnockback, move);
+		this.deflectingSound = sound2;
+		createTestAttackAnimation();//prueba animacion de ataque
+		createDeflectAnimation();
+		createWalkingAnimation();
+	}
 	public CharacterPlayer (Texture spriteTable, Texture sprite, String name)
 	{
 		super(spriteTable, sprite, name, 5, 0);
@@ -97,13 +105,13 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	public void createAttackHitbox ()
 	{
 		//esto hará que el jugador haga daño conforme toque las cosas?
-		Rectangle swordHitbox = new Rectangle();
-		swordHitbox.height = 64;
-		swordHitbox.width = 64;
-		swordHitbox.x = getPosX()+10;
-		swordHitbox.y = getPosY()+10;
+		Rectangle attackHitbox = new Rectangle();
+		attackHitbox.height = 64;
+		attackHitbox.width = 64;
+		attackHitbox.x = getPosX()+10;
+		attackHitbox.y = getPosY()+10;
 		
-		setAttackHitbox(swordHitbox);
+		setAttackHitbox(attackHitbox);
 	}
 	public void createTestAttackAnimation()
 	{
@@ -239,16 +247,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	{
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
-			if (getFacingRight())
-			{
-			}
-			else
-			{
-			}
-			attackMovementTimer += 1;		/* esto es lo que realmente para a la animación, a ver
-											 * podría arreglar esto para que quede más bonito, no
-											 * lo voy a hacer hoy
-											 **/
+			attackMovementTimer += 1;
+			/* esto es lo que realmente para a la animación, a ver						 
+			 * podría arreglar esto para que quede más bonito, no
+			 * lo voy a hacer hoy
+			 **/
 			this.renderAnimation(attackAnimation, batch);
 		}
 		else

@@ -6,4 +6,5 @@ public interface IMovement
 {
 	public abstract void moveLeft (Rectangle hitbox, float amount);
 	public abstract void moveRight (Rectangle hitbox, float vel);
+	public abstract void continueMoving (Rectangle hitbox);
 }

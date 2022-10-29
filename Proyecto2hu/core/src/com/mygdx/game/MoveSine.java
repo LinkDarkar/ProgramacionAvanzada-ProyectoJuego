@@ -21,6 +21,11 @@ public class MoveSine implements IMovement {
 		//System.out.println("Current "+current);
 		IncreaseCurrent();
 	}
+	
+	public void continueMoving(Rectangle hitbox)
+	{
+		
+	}
 
 	private void IncreaseCurrent()
 	{

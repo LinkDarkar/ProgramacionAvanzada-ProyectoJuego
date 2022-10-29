@@ -5,16 +5,21 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mygdx.game.Entity.Team;
 
 public class Test_Screen extends ScreenBase {
 	private CharacterPlayer<MoveByPixel> player;
 	//private CharacterPlayer<MoveCircle> player2;
-	private CharacterBoss<MoveByPixel> enemy;
+	private CharacterBoss<MoveVectorial> enemy;
 	private ArrayList<Projectile> projectilesList;
 	private int startingPos = 60;
 	private float timeCounter = 0;
+	
+	private ShapeRenderer floor;
+	private Texture floorTexture;
 
 	// Se ejecuta siempre que se llege a esta pantalla
 	@SuppressWarnings("rawtypes")
@@ -31,6 +36,7 @@ public class Test_Screen extends ScreenBase {
 				new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
 				hurtSound, deflectingSound,
 				"Youmu",
+				50, //hp
 				Team.Player,
 				true,
 				new MoveByPixel());
@@ -43,15 +49,15 @@ public class Test_Screen extends ScreenBase {
 		//player2.getHitbox().y = 100;
 
 		// crear enemigo
-		enemy = new CharacterBoss<MoveByPixel>(
+		enemy = new CharacterBoss<MoveVectorial>(
 				new Texture(Gdx.files.internal("MiriamIdleAnim_0.png")),
 				new Texture(Gdx.files.internal("MiriamIdleAnim_0.png")),
-				23,
+				100, //hp
 				hurtSound,
 				"Miriam",
 				Team.IA,
 				true,
-				new MoveByPixel());
+				new MoveVectorial());
 		spawnAt(enemy, startingOffset, true);
 		
 		// Creates the new Projectiles List
@@ -77,6 +83,8 @@ public class Test_Screen extends ScreenBase {
 				false,
 				new MoveSine()));
 		System.out.println("Proyectile Created");
+		
+		setVoidColor(new Color(0.6f,0.8f,0.8f,1));
 	}
 
 	public void DrawSprites()
@@ -100,6 +108,7 @@ public class Test_Screen extends ScreenBase {
 			//System.out.println("Proyectile Drawn");
 		}
 		//player2.renderFrame(getBatch());
+		getBatch().draw(new Texture(Gdx.files.internal("floor.png")), 0, 0);
 	}
 	
 	public void ManageFont()
@@ -126,6 +135,7 @@ public class Test_Screen extends ScreenBase {
 	public void CheckInputs()
 	{
 		player.controlCharacterPlayer(getBatch());
+		enemy.AIBehaveour();
 		//player2.controlCharacterPlayer(getBatch());
 	}
 	
