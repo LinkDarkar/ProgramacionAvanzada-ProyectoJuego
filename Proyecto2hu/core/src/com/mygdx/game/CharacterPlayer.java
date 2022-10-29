@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 public class CharacterPlayer<Move extends IMovement> extends Character<Move>
-{
+{	
 	/* variables que formarán partes de la importación
 	 * de las animaciones
 	 * */
@@ -61,25 +61,28 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private Animation<TextureRegion> walkingAnimation;
 	private final float WALKING_FRAME_DURATION = 0.065f;	//duración de los frames de la animación
 
-	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, String name, boolean canTakeKnockback, Move move)
+	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, Sound sound3, 
+			String name, boolean canTakeKnockback, Move move)
 	{
-		super(spriteTable, sprite, sound, name, 5, 0, canTakeKnockback, move);
+		super(spriteTable, sprite, sound, sound3, name, 5, 0, canTakeKnockback, move);
 		this.deflectingSound = sound2;
 		createTestAttackAnimation();//prueba animacion de ataque
 		createDeflectAnimation();
 		createWalkingAnimation();
 	}
-	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, String name, Team team, boolean canTakeKnockback, Move move)
+	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, Sound sound3,
+			String name, Team team, boolean canTakeKnockback, Move move)
 	{
-		super(spriteTable, sprite, sound, name, 5, 0, team, canTakeKnockback, move);
+		super(spriteTable, sprite, sound, sound3,name, 5, 0, team, canTakeKnockback, move);
 		this.deflectingSound = sound2;
 		createTestAttackAnimation();//prueba animacion de ataque
 		createDeflectAnimation();
 		createWalkingAnimation();
 	}
-	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, String name, int hp, Team team, boolean canTakeKnockback, Move move)
+	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, Sound sound3,
+			String name, int hp, Team team, boolean canTakeKnockback, Move move)
 	{
-		super(spriteTable, sprite, sound, name, hp, 0, team, canTakeKnockback, move);
+		super(spriteTable, sprite, sound, sound3, name, hp, 0, team, canTakeKnockback, move);
 		this.deflectingSound = sound2;
 		createTestAttackAnimation();//prueba animacion de ataque
 		createDeflectAnimation();
@@ -103,6 +106,17 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		return hitbox;
 	}
 	public void createAttackHitbox ()
+	{
+		//esto hará que el jugador haga daño conforme toque las cosas?
+		Rectangle attackHitbox = new Rectangle();
+		attackHitbox.height = 64;
+		attackHitbox.width = 64;
+		attackHitbox.x = getPosX()+10;
+		attackHitbox.y = getPosY()+10;
+		
+		setAttackHitbox(attackHitbox);
+	}
+	public void createAttackHitboxDebug ()
 	{
 		//esto hará que el jugador haga daño conforme toque las cosas?
 		Rectangle attackHitbox = new Rectangle();

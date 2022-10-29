@@ -29,12 +29,13 @@ public class Test_Screen extends ScreenBase {
 		int startingOffset = 200;
 		Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
 		Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
+		Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
 
 		// Creates a Player Entity
 		player = new CharacterPlayer<MoveByPixel>(
 				new Texture(Gdx.files.internal("ch14.png")),
 				new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
-				hurtSound, deflectingSound,
+				hurtSound, deflectingSound, succesfulDeflectSound,
 				"Youmu",
 				50, //hp
 				Team.Player,
