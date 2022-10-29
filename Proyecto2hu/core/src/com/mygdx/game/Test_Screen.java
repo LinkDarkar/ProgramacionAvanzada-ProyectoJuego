@@ -86,6 +86,7 @@ public class Test_Screen extends ScreenBase {
 		for (int i = 0 ; i < projectilesList.size() ; i++)
 		{
 			Projectile<?> currentPro = projectilesList.get(i);
+			/*
 			if(currentPro.checkCollision(player))
 			{
 				projectilesList.remove(i);
@@ -95,7 +96,7 @@ public class Test_Screen extends ScreenBase {
 			{
 				projectilesList.remove(i);
 				continue;
-			}
+			}*/
 			currentPro.renderFrame(getBatch(), null);
 			//System.out.println("Proyectile Drawn");
 		}

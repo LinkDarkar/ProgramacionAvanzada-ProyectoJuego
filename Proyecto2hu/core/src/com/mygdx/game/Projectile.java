@@ -76,8 +76,9 @@ public class Projectile<Move extends IMovement> extends Entity
 		return hitbox;
 	}
 
-	@Override
-	public void renderFrame(SpriteBatch batch, Character<?> character) {
+	//@Override
+	public void renderFrame(SpriteBatch batch, Character<?> character)
+	{
 		if(movingRight) move.moveRight(getHitbox(), speed);
 		else move.moveLeft(getHitbox(), speed);
 		batch.draw(getSprite(), getHitbox().x, getHitbox().y );

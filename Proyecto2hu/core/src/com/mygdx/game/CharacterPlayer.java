@@ -50,8 +50,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private int deflectCooldownTimerDefault = 20;
 	private boolean deflectInCooldown = false;
 	
-	private int dashTime = 0;
-	private int dashTimeDefault = 6;
+	private float dashTime = 0f;
+	private float dashTimeDefault = 0.12f;
 	private int dashCooldownTimer;
 	private int dashCooldownTimerDefault = 35;
 	private boolean dashInCooldown = false;
@@ -286,7 +286,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		if (dashTime < dashTimeDefault)
 		{
 			dash();
-			dashTime += 1;
+			dashTime += Gdx.graphics.getDeltaTime();
 			batch.draw(getSprite(), getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 		}
 		else
