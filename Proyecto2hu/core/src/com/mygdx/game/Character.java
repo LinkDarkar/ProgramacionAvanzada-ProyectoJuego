@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character<Move extends IMovement> extends Entity
 {
-	Texture swordHitboxTexture;
+	Texture swordHitboxTexture;	//
 	private Move move;
 
 	//private Animation animation;
@@ -36,7 +36,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		iFrames
 	}
 	
-	private boolean damageDone = false;
+	private boolean hitboxCollisioned = false;
 	private boolean facingRight;
 	private int xvel;
 	private boolean canTakeKnockback = true;
@@ -155,9 +155,9 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		return this.characterState;
 	}
-	public boolean getDamageDone ()
+	public boolean getHitboxCollisioned ()
 	{
-		return this.damageDone;
+		return this.hitboxCollisioned;
 	}
 	public boolean getFacingRight()
 	{
@@ -192,46 +192,36 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		this.facingRight = facingRight;
 	}
-	public void setAttackHitboxFacingDirection ()
+	public void setHitboxCollisioned (boolean hitboxCollisioned)
 	{
-		if (this.facingRight == true)
-		{
-			this.attackHitbox.x = getPosX() + 100;
-		}
-		else
-		{
-			this.attackHitbox.x = getPosX() - 100;
-		}
-	}
-	public void setDamageDone (boolean damageDone)
-	{
-		this.damageDone = damageDone;
+		this.hitboxCollisioned = hitboxCollisioned;
 	}
 	/**********************COMBATE****************************/
-	public abstract void attack (SpriteBatch batch);
+	public abstract void attack (SpriteBatch batch, Character<?> enemyCharacter);
 	public abstract void deflect (SpriteBatch batch);
 	public abstract void walking (SpriteBatch batch);
 	public abstract void dashing (SpriteBatch batch);
 	//igual el de abajo debería de ser un boolean para que si retorna false recibe un golpe
 	public abstract void blockOrDeflect ();
-	public void gotHit (Character<?> characterAggresor)
+	public void collisionHit (Character<?> characterAggresor)
 	{
 		//en vez de flagear al agresor, debería flagearse a sí mismo
 		if (characterAggresor.getCharacterState() == CharacterState.attacking 
 				&& characterAggresor.attackHitbox.overlaps(this.getHitbox())
-				&& characterAggresor.getDamageDone() == false)
+				&& this.getHitboxCollisioned() == false)
 		{
 			if(getCharacterState() != CharacterState.deflecting)
 			{
 				this.takeDamage(2);
 				if (canTakeKnockback) takeKnockback(0.2f, 50, characterAggresor.getFacingRight());
-				characterAggresor.setDamageDone(true);
+				this.setHitboxCollisioned(true);
 				hurtSound.play(0.2f);
 				System.out.println("damageDone = true");
 			}
 			else
 			{
 				characterAggresor.takeKnockback(0.1f, 10, characterAggresor.getFacingRight());
+				this.setHitboxCollisioned(true);
 				System.out.println("PARRY");
 				// SONIDO DE PARRY
 				succesfulDeflectSound.play(0.2f);
@@ -296,16 +286,14 @@ public abstract class Character<Move extends IMovement> extends Entity
 	/**********************ACTUALIZACION****************************/
 	public void renderFrame (SpriteBatch batch, Character<?> enemyCharacter)
 	{
-		this.attackHitbox.x = facingRight ? getPosX() + 100 : getPosX() - 100;
+		this.attackHitbox.x = facingRight ? getPosX() + 50 : getPosX() - 50;
 		//System.out.println("hitbox width = "+ Float.toString(getHitboxWidth()));
 		//System.out.println("facing right: "+ getFacingRight());
-		//setAttackHitboxFacingDirection();
 		System.out.println("posX: " + this.getPosX());
-		//attackHitbox.x = getPosX() + getHitboxWidth();
 		System.out.println("attackHitbox.x = "+ attackHitbox.x);
 		this.attackHitbox.y = getPosY();
 		
-		gotHit(enemyCharacter);
+		collisionHit(enemyCharacter);
 		switch (characterState)
 		{
 			case inKnockback:
@@ -317,7 +305,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 
 				break;
 			case attacking:
-				attack(batch);
+				attack(batch, enemyCharacter);
 				break;
 			case idle:
 				batch.draw(getSprite(), getHitbox().x, getHitbox().y);

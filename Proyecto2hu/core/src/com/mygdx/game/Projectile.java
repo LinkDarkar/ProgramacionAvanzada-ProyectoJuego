@@ -93,4 +93,9 @@ public class Projectile<Move extends IMovement> extends Entity
 		System.out.println("Proyectile DID NOT collision");
 		return false;
 	}
+	@Override
+	public void collisionHit(Character<?> character) {
+		// TODO Auto-generated method stub
+		
+	}
 }

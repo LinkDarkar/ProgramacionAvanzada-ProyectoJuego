@@ -68,6 +68,7 @@ public abstract class Entity
 	
 	public abstract Rectangle createHitbox();
 	public abstract void renderFrame(SpriteBatch batch, Character<?> character);
+	public abstract void collisionHit(Character<?> character);
 	
 	/**********************DEBUG****************************/
 	public void debugHitboxViewerRender ()

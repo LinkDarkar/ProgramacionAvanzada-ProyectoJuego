@@ -180,7 +180,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	}
 
 	@Override
-	public void attack(SpriteBatch batch)
+	public void attack(SpriteBatch batch, Character<?> characterPlayer)
 	{
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
@@ -189,7 +189,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 		}
 		else
 		{
-			setDamageDone(false);
+			characterPlayer.setHitboxCollisioned(false);
 			setCharacterState(CharacterState.idle);
 			attackMovementTimer = 0;
 		}

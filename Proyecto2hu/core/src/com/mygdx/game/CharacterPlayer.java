@@ -257,7 +257,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		if(getHitbox().x > 800 - 64) getHitbox().x = 800 - 64;
 	}
 
-	public void attack (SpriteBatch batch)
+	public void attack (SpriteBatch batch, Character<?> enemyCharacter)
 	{
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
@@ -270,7 +270,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		}
 		else
 		{
-			setDamageDone(false);
+			enemyCharacter.setHitboxCollisioned(false);
 			setCharacterState(CharacterState.idle);
 			attackMovementTimer = 0;
 		}

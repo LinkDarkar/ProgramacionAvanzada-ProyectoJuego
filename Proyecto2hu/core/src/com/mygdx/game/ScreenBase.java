@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class ScreenBase implements Screen {
 	final Proyecto2hu game;
 	private SpriteBatch batch;
 	private BitmapFont font;
 	private OrthographicCamera camera;
+	ExtendViewport viewport;
 	private Color voidColor;
 
 	public SpriteBatch getBatch() {
@@ -58,6 +60,7 @@ public class ScreenBase implements Screen {
         this.voidColor = new Color(0.2f,0.2f,0.2f,1);
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
+		viewport = new ExtendViewport(800,480,camera);
 	}
 
 	@Override
@@ -88,9 +91,11 @@ public class ScreenBase implements Screen {
 	}
 
 	@Override
-	public void resize(int width, int height) {
+	public void resize(int width, int height)
+	{
 		// TODO Auto-generated method stub
-
+		viewport.update(width, height, true);
+		//batch.setProjectionMatrix(camera.combined);
 	}
 
 	@Override
