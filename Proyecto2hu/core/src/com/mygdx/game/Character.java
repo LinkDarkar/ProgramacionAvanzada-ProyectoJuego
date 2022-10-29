@@ -258,6 +258,14 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public void dash()
 	{
 		characterState = CharacterState.dashing;
+		if (facingRight == true)
+		{
+			move.moveRight(getHitbox(), xvel*4);
+		}
+		else
+		{
+			move.moveLeft(getHitbox(), xvel*4);
+		}
 	}
 
 	/**********************ACTUALIZACION****************************/
