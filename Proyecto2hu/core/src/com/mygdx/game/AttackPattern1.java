@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.Character.CharacterState;
 
-public class AttackPattern implements IAttack, IMovement 
+public class AttackPattern1 implements IAttack, IMovement 
 {
 	private Animation<TextureRegion> animation;
 	private int[] hitboxActivationFrames;  //sus tamaños y variables que guarden podrían ser hardcodeados

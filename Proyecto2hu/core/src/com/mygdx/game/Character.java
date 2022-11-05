@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
@@ -47,31 +49,12 @@ public abstract class Character<Move extends IMovement> extends Entity
 		lookingRight;
 	}
 	private boolean chargingAttack = true;	//Esto solo lo usa el jefe, ya se, está mal y jode la encapsulación
-	private boolean hitboxCollisioned = false;
 	private boolean facingRight;
 	private boolean canTakeKnockback = true;
 	private boolean knockbackDirection;
 	
-	public Character(Texture spriteTable, Texture sprite, Sound hurtSound, Sound succesfulDeflectSound, 
-			String name, int health, int posture, boolean canTakeKnockback, Move move)
-	{
-		super(sprite);
-		
-		this.swordHitboxTexture = new Texture("penitent_rangeAttack_projectile_anim_4.png");
-		this.hurtSound = hurtSound;
-		this.succesfulDeflectSound = succesfulDeflectSound;
-		this.nombre = name;
-		this.health = health;
-		this.posture = posture;
-		this.facingRight = true;
-		this.xvel = 130;
-		this.canTakeKnockback = canTakeKnockback;
-		this.move = move;
-	
-		createAttackHitbox();
-	}
 	public Character(Texture spriteTable, Texture sprite, Sound hurtSound, Sound succesfulDeflectSound,
-			String name, int health, int posture, Team team, boolean canTakeKnockback, Move move)
+			String name, int health, Team team, boolean canTakeKnockback, Move move)
 	{
 		super(sprite, team);
 		
@@ -80,39 +63,12 @@ public abstract class Character<Move extends IMovement> extends Entity
 		this.succesfulDeflectSound = succesfulDeflectSound;
 		this.nombre = name;
 		this.health = health;
-		this.posture = posture;
+		this.posture = 0;
 		this.facingRight = true;
 		this.xvel = 130;
 		this.canTakeKnockback = canTakeKnockback;
 		this.move = move;
 	
-		createAttackHitbox();
-	}
-	public Character(Texture spriteTable, Texture sprite, String name, int health, int posture)
-	{
-		super(sprite);
-		this.swordHitboxTexture = new Texture("penitent_rangeAttack_projectile_anim_4.png");
-		this.nombre = name;
-		this.health = health;
-		this.posture = posture;
-		this.facingRight = true;
-		this.xvel = 180;
-		this.canTakeKnockback = true;
-	
-		createAttackHitbox();
-	}
-	
-	//porque la postura siempre empezará en 0
-	public Character (Texture sprite, String name, Sound sound, int health)
-	{
-		super(sprite);
-		this.nombre = name;
-		this.health = health;
-		this.hurtSound = sound;
-		this.posture = 0;
-		this.facingRight = false;
-		this.xvel = 600;
-		
 		createAttackHitbox();
 	}
 	
@@ -167,10 +123,6 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		return this.chargingAttack;
 	}
-	public boolean getHitboxCollisioned ()
-	{
-		return this.hitboxCollisioned;
-	}
 	public boolean getFacingRight()
 	{
 		return this.facingRight;
@@ -204,16 +156,12 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		this.facingRight = facingRight;
 	}
-	public void setHitboxCollisioned (boolean hitboxCollisioned)
-	{
-		this.hitboxCollisioned = hitboxCollisioned;
-	}
 	public void setChargingAttack (boolean chargingAttack)
 	{
 		this.chargingAttack = chargingAttack;
 	}
 	/**********************COMBATE****************************/
-	public abstract void attack (SpriteBatch batch, Character<?> enemyCharacter, boolean chargingAttack);
+	public abstract void attack (SpriteBatch batch, ArrayList<Entity> entitiesList);
 	public abstract void deflect (SpriteBatch batch);
 	public abstract void walking (SpriteBatch batch);
 	public abstract void dashing (SpriteBatch batch);
@@ -221,27 +169,30 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public abstract void blockOrDeflect ();
 	public void collisionHit (Character<?> characterAggresor)
 	{
+		if (this.getTeam() == characterAggresor.getTeam()) return;
+		//System.out.println("Checking Collition Conditions");
 		//en vez de flagear al agresor, debería flagearse a sí mismo
-		if (characterAggresor.getCharacterState() == CharacterState.attacking 
-				&& characterAggresor.attackHitbox.overlaps(this.getHitbox())
-				&& characterAggresor.getChargingAttack() == false
-				&& this.getHitboxCollisioned() == false)
+		if (characterAggresor.getCharacterState() == CharacterState.attacking && // Foe is attacking
+			characterAggresor.attackHitbox.overlaps(this.getHitbox()) && // The Hitbox is collisioning
+			characterAggresor.getChargingAttack() == false && // The hitbox is active
+			this.canGetHit() == true) // The unit can get hit
 		{
-			if(getCharacterState() != CharacterState.deflecting)
-			{
-				this.takeDamage(2);
-				if (canTakeKnockback) takeKnockback(0.2f, 50, characterAggresor.getFacingRight());
-				this.setHitboxCollisioned(true);
-				hurtSound.play(0.2f);
-				System.out.println("damageDone = true");
-			}
-			else
+			System.out.println("Collition Conditions met");
+			if(getCharacterState() == CharacterState.deflecting)
 			{
 				characterAggresor.takeKnockback(0.1f, 10, characterAggresor.getFacingRight());
-				this.setHitboxCollisioned(true);
+				this.setCanGetHit(false);
 				System.out.println("PARRY");
 				// SONIDO DE PARRY
 				succesfulDeflectSound.play(0.2f);
+			}
+			else
+			{
+				this.takeDamage(2);
+				if (canTakeKnockback) takeKnockback(0.2f, 50, characterAggresor.getFacingRight());
+				this.setCanGetHit(false);
+				hurtSound.play(0.2f);
+				System.out.println("damageDone = true");
 			}
 		}
 	}
@@ -301,7 +252,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	}
 
 	/**********************ACTUALIZACION****************************/
-	public void renderFrame (SpriteBatch batch, Character<?> enemyCharacter)
+	/*public void renderFrame (SpriteBatch batch, Character<?> enemyCharacter)
 	{
 		this.attackHitbox.x = facingRight ? getPosX() + 50 : getPosX() - 50;
 		//System.out.println("posX: " + this.getPosX());
@@ -341,6 +292,61 @@ public abstract class Character<Move extends IMovement> extends Entity
 		
 		batch.draw(this.swordHitboxTexture, attackHitbox.x, attackHitbox.y);
 		//debugSwordHitboxViewerRender();
+	}*/
+	
+	public void renderFrame (SpriteBatch batch, ArrayList<Entity> entitiesList)
+	{
+		this.attackHitbox.x = facingRight ? getPosX() + 50 : getPosX() - 50;
+		//System.out.println("posX: " + this.getPosX());
+		//System.out.println("attackHitbox.x = "+ attackHitbox.x);
+		this.attackHitbox.y = getPosY();
+		
+		for (int index = 0 ; index < entitiesList.size() ; index++)
+		{
+			Entity entity = entitiesList.get(index);
+			if (entity == this) continue;
+			entity.collisionHit(this);
+		}
+		//collisionHit(enemyCharacter);
+		switch (characterState)
+		{
+			case idle:
+				batch.draw(getSprite(), getHitbox().x, getHitbox().y);
+				break;
+			case walking:
+				walking(batch);
+				break;
+			case attacking:
+				attack(batch, entitiesList); 
+				break;
+			case deflecting:
+				deflect(batch);
+				break;
+			case dashing:
+				dashing(batch);
+				break;
+			case inKnockback:
+				if (knockbackCount > 0) moveKnockback();
+				else characterState = CharacterState.idle;
+				
+				break;
+			default:
+				characterState = CharacterState.idle;
+				break;
+		}
+		
+		batch.draw(this.swordHitboxTexture, attackHitbox.x, attackHitbox.y);
+		//debugSwordHitboxViewerRender();
+	}
+	
+	protected void allowOtherUnitsToGetHit(ArrayList<Entity> entitiesList)
+	{
+		for (int index = 0 ; index < entitiesList.size() ; index++)
+		{
+			Entity entity = entitiesList.get(index);
+			if (entity == this) continue;
+			entity.setCanGetHit(true);
+		}
 	}
 	
 	/**********************Debug****************************/

@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -77,7 +79,7 @@ public class Projectile<Move extends IMovement> extends Entity
 	}
 
 	//@Override
-	public void renderFrame(SpriteBatch batch, Character<?> character)
+	public void renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
 		if(movingRight) move.moveRight(getHitbox(), speed);
 		else move.moveLeft(getHitbox(), speed);

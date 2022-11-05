@@ -1,9 +1,10 @@
 package com.mygdx.game;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
@@ -58,41 +59,15 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 
 
 //Constructores
-	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, Sound sound3, 
-			String name, boolean canTakeKnockback, Move move)
-	{
-		super(spriteTable, sprite, sound, sound3, name, 5, 0, canTakeKnockback, move);
-		this.deflectingSound = sound2;
-		createTestAttackAnimation();//prueba animacion de ataque
-		createDeflectAnimation();
-		createWalkingAnimation();
-	}
-	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, Sound sound3,
-			String name, Team team, boolean canTakeKnockback, Move move)
-	{
-		super(spriteTable, sprite, sound, sound3,name, 5, 0, team, canTakeKnockback, move);
-		this.deflectingSound = sound2;
-		createTestAttackAnimation();//prueba animacion de ataque
-		createDeflectAnimation();
-		createWalkingAnimation();
-	}
 	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, Sound sound3,
 			String name, int hp, Team team, boolean canTakeKnockback, Move move)
 	{
-		super(spriteTable, sprite, sound, sound3, name, hp, 0, team, canTakeKnockback, move);
+		super(spriteTable, sprite, sound, sound3, name, hp, team, canTakeKnockback, move);
 		this.deflectingSound = sound2;
 		createTestAttackAnimation();//prueba animacion de ataque
 		createDeflectAnimation();
 		createWalkingAnimation();
 	}
-	public CharacterPlayer (Texture spriteTable, Texture sprite, String name)
-	{
-		super(spriteTable, sprite, name, 5, 0);
-		createTestAttackAnimation();//prueba animacion de ataque
-		createDeflectAnimation();
-	}
-
-
 
 //Creación de elementos del jugador
 	public Rectangle createHitbox ()
@@ -176,9 +151,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		switch (getCharacterState())
 		{
 			case idle:
-			{
 				stateTime = 0f;
-			}
 			case walking:
 			{
 				//if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.RIGHT)) || 
@@ -188,16 +161,9 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 				//si ninguna o ambas lo son entonces retorna False
 				if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) ^ Gdx.input.isKeyPressed(Input.Keys.RIGHT)))
 				{
-					if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
-					{
-						setCharacterState(CharacterState.walking);
-						setFacingDirection(false);
-					}
-					if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-					{
-						setCharacterState(CharacterState.walking);
-						setFacingDirection(true);
-					}
+					if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) setFacingDirection(false);
+					else setFacingDirection(true);
+					setCharacterState(CharacterState.walking);
 				}
 				else
 				{
@@ -209,21 +175,21 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 					attackInCooldown = true;
 					setCharacterState(CharacterState.attacking);
 				}
-				if(Gdx.input.isKeyJustPressed(Input.Keys.X) && deflectInCooldown == false)
+				else if(Gdx.input.isKeyJustPressed(Input.Keys.X) && deflectInCooldown == false)
 				{
 					deflectingSound.play(0.1f);
 					stateTime = 0f;
 					attackInCooldown = true;
 					setCharacterState(CharacterState.deflecting);
 				}
-				if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT) && dashInCooldown == false)
+				else if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT) && dashInCooldown == false)
 				{
 					dashInCooldown = true;
 					setCharacterState(CharacterState.dashing);
 				}
 				break;
 			}
-			case attacking:
+			/*case attacking:
 			{
 				//no se si deberíamos dejar lo de renderizar las animaciones en 
 				//CharacterPlayer o en Character, igual en Character queda un poco raro,
@@ -234,7 +200,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 			case deflecting:
 			{
 				break;
-			}
+			}*/
 			default:
 				break;
 		}
@@ -260,7 +226,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 
 
 //Control de animaciones y estados
-	public void attack (SpriteBatch batch, Character<?> enemyCharacter, boolean chargingAttack)
+	public void attack (SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
@@ -274,7 +240,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		}
 		else
 		{
-			enemyCharacter.setHitboxCollisioned(false);
 			setChargingAttack(true);
 			setCharacterState(CharacterState.idle);
 			attackMovementTimer = 0;

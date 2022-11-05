@@ -80,7 +80,8 @@ public class ScreenBase implements Screen {
 		batch.begin();
 		
 		
-		DrawSprites();
+		RenderFrame();
+
 		ManageFont();
 
 		batch.end();
@@ -127,7 +128,7 @@ public class ScreenBase implements Screen {
 		// Dibuja los textos
 	}
 
-	public void DrawSprites()
+	public void RenderFrame()
 	{
 		//Dibuja los sprites
 	}

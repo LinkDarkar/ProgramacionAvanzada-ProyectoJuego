@@ -12,15 +12,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.Character.CharacterState;
+import com.mygdx.game.Entity.Team;
 
 public class CharacterBoss<Move extends IMovement> extends Character<Move>
 {
 	/* There is a problem with this, and is that there will be some attacks that
 	 * the boss will only do when the player is far from them.
 	 * */
-	//AttackPattern[] attackPatterns;
-	AttackPattern[] rangedAttackPatterns;	//this could be a possible solution for this
-	private ArrayList<AttackPattern> attackPatterns;
 	
 	
 	/* TODO:
@@ -29,6 +27,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	 * 
 	 *
 	*/
+	private Character<?> characterPlayer;
 	
 	private Texture auxTexture;						//donde se guarda el spritemap
 	TextureRegion[] auxAnimationFrames;				//donde se guardan los frames
@@ -44,6 +43,9 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	private int attackMovementTimer;
 	private int attackMovementTimerDefault = 120;	//tarda 28 frames en poder volver a moverse
 	private boolean attackInCooldown = false;		//indica si el ataque está en cooldown
+	private int currentAttack = 0;
+	
+	private ArrayList<IAttack> attacksList;
 
 	
 	//debería tener un estado que indique si se le puede interrumpir
@@ -78,64 +80,62 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	private Animation<TextureRegion> walkingAnimation;
 	private final float WALKING_FRAME_DURATION = 0.065f;	//duración de los frames de la animación
 	
-	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound,
-			String name, Move move)
-	{
-		super(sprite, name, sound, hp, false, move);
-	}
-	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound, String name,
-			boolean canTakeKnockback, Move move)
-	{
-		super(sprite, name, sound, hp, canTakeKnockback, move);
-	}
-	public CharacterBoss(Texture sprite, Texture spriteTableAttack, int hp, Sound sound,
+	public CharacterBoss(Texture sprite, Texture spriteTableAttack, int hp, Sound hurtSound,
 			String name, Team team, boolean canTakeKnockback, Move move)
 	{
-		super(sprite, name, sound, hp, canTakeKnockback, move);
-		this.attackPatterns = new ArrayList<AttackPattern>(1);
+		super(null, sprite, hurtSound, null, name, hp, team, canTakeKnockback, move);
+		/*this.attackPatterns = new ArrayList<AttackPattern>(1);
 		AttackPattern ptrn = new AttackPattern(spriteTableAttack, 0.5f);
-		this.attackPatterns.add(ptrn);
+		this.attackPatterns.add(ptrn);*/
+		TestCreateAttackList(spriteTableAttack);
 	}
 	
-
 	public void createAttackHitbox()
 	{
-		Rectangle swordHitbox = new Rectangle();
-		swordHitbox.height = 64;
-		swordHitbox.width = 64;
-		swordHitbox.x = getPosX()+10;
-		swordHitbox.y = getPosY()+10;
+		Rectangle attackHitbox = new Rectangle();
+		attackHitbox.height = 64;
+		attackHitbox.width = 64;
+		attackHitbox.x = getPosX()+10;
+		attackHitbox.y = getPosY()+10;
 		
-		setAttackHitbox(swordHitbox);
+		setAttackHitbox(attackHitbox);
+	}
+	
+	private void TestCreateAttackList(Texture spriteTableAttack)
+	{
+		attacksList = new ArrayList<IAttack>();
+		//attacksList.add(new AttackPattern1(spriteTableAttack, 0.5f));
+		attacksList.add(new AttackSimple());
+		//attacksList.add(null);
+		//attacksList.add(null);
+		//attacksList.add(null);
 	}
 	
 	
-	public void AIBehaveour()
+	public void AIBehaveour(SpriteBatch batch)
 	{
 		switch (getCharacterState())
 		{
 			case idle:
-			{
-			}
 			case walking:
 			{
+				if(Gdx.input.isKeyJustPressed(Input.Keys.P) && attackInCooldown == false)
+				{
+					stateTime = 0f;
+					attackInCooldown = true;
+					setCharacterState(CharacterState.attacking);
+					break;
+				}
 				this.getMove().continueMoving(getHitbox());
 				int randomMove = ThreadLocalRandom.current().nextInt(1, 101);
 				if (randomMove > 99) moveLeft();
 				else if(randomMove > 98) moveRight();
 				setCharacterState(CharacterState.idle);
-				randomState();
+				//randomState();
 				break;
 			}
 			case attacking:
 			{
-				if(attackInCooldown == false)
-				{
-					stateTime = 0f;
-					attackInCooldown = true;
-					setCharacterState(CharacterState.attacking);
-				}
-				break;
 			}
 			case deflecting:
 			{
@@ -194,22 +194,34 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 		return hitbox;
 	}
 
-	public void attack(SpriteBatch batch, Character<?> characterPlayer, boolean chargingAttack)
-	{
-		if (attackMovementTimer < attackMovementTimerDefault)
+	public void attack(SpriteBatch batch, ArrayList<Entity> entitiesList)
+	{		switch(attacksList.get(currentAttack).attack())
 		{
-			attackMovementTimer += 1;
-			stateTime += Gdx.graphics.getDeltaTime();
-			attackPatterns.get(0).attack(getChargingAttack(), stateTime, attackMovementTimer);
-			//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
-			batch.draw(attackPatterns.get(0).getAnimation().getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
-			//batch.draw(new Texture(Gdx.files.internal("MiriamPrayerSwordAttack_18.png")), this.getPosX(), this.getPosY());
-		}
-		else
-		{
-			characterPlayer.setHitboxCollisioned(false);
-			setCharacterState(CharacterState.idle);
-			attackMovementTimer = 0;
+			case 0: // The Attack Finished
+				System.out.println("Case 0");
+				setChargingAttack(true);
+				setCharacterState(CharacterState.idle);
+				attackInCooldown = false;
+				//renderAnimation(attackAnimation, batch);
+				break;
+			case 1: // the attack hitbox is Off but not finished
+				System.out.println("Case 1");
+				setChargingAttack(false);
+				// set entities to be able to get hit again
+				for (int index = 0 ; index < entitiesList.size() ; index++)
+				{
+					Entity entity = entitiesList.get(index);
+					if (entity == this) continue;
+					entity.setCanGetHit(true);
+				}
+				break;
+			case 2: // the attack hitbox is On
+				System.out.println("Case 2");
+				setChargingAttack(true);
+				break;
+			default:
+				System.out.println("Default Case");
+				break;
 		}
 	}
 
