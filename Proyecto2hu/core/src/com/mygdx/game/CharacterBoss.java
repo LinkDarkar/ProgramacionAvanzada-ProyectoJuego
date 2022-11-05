@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -14,6 +15,13 @@ import com.mygdx.game.Character.CharacterState;
 
 public class CharacterBoss<Move extends IMovement> extends Character<Move>
 {
+	/* There is a problem with this, and is that there will be some attacks that
+	 * the boss will only do when the player is far from them.
+	 * */
+	//AttackPattern[] attackPatterns;
+	AttackPattern[] rangedAttackPatterns;	//this could be a possible solution for this
+	private ArrayList<AttackPattern> attackPatterns;
+	
 	
 	/* TODO:
 	 * declarar AI
@@ -32,9 +40,9 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	//private float stateTimeAttack = 0f;			//indicará a la función el frame que tendrá que mostrar
 	private final float ATTACK_FRAME_DURATION = 0.21f;	//duración de los frames de la animación
 	private int attackCooldownTimer;
-	private int attackCooldownTimerDefault = 24;	//tarda 24 frames en poder volver a atacar
+	private int attackCooldownTimerDefault = 120;	//tarda 24 frames en poder volver a atacar
 	private int attackMovementTimer;
-	private int attackMovementTimerDefault = 28;	//tarda 28 frames en poder volver a moverse
+	private int attackMovementTimerDefault = 120;	//tarda 28 frames en poder volver a moverse
 	private boolean attackInCooldown = false;		//indica si el ataque está en cooldown
 
 	
@@ -70,20 +78,26 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	private Animation<TextureRegion> walkingAnimation;
 	private final float WALKING_FRAME_DURATION = 0.065f;	//duración de los frames de la animación
 	
-	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound, String name, Move move)
+	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound,
+			String name, Move move)
 	{
 		super(sprite, name, sound, hp, false, move);
 	}
-	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound, String name, boolean canTakeKnockback, Move move)
+	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound, String name,
+			boolean canTakeKnockback, Move move)
 	{
 		super(sprite, name, sound, hp, canTakeKnockback, move);
 	}
-	public CharacterBoss(Texture spriteTable, Texture sprite, int hp, Sound sound, String name, Team team, boolean canTakeKnockback, Move move)
+	public CharacterBoss(Texture sprite, Texture spriteTableAttack, int hp, Sound sound,
+			String name, Team team, boolean canTakeKnockback, Move move)
 	{
 		super(sprite, name, sound, hp, canTakeKnockback, move);
+		this.attackPatterns = new ArrayList<AttackPattern>(1);
+		AttackPattern ptrn = new AttackPattern(spriteTableAttack, 0.5f);
+		this.attackPatterns.add(ptrn);
 	}
 	
-	
+
 	public void createAttackHitbox()
 	{
 		Rectangle swordHitbox = new Rectangle();
@@ -94,6 +108,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 		
 		setAttackHitbox(swordHitbox);
 	}
+	
 	
 	public void AIBehaveour()
 	{
@@ -179,13 +194,16 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 		return hitbox;
 	}
 
-	@Override
-	public void attack(SpriteBatch batch, Character<?> characterPlayer)
+	public void attack(SpriteBatch batch, Character<?> characterPlayer, boolean chargingAttack)
 	{
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
 			attackMovementTimer += 1;
-			batch.draw(new Texture(Gdx.files.internal("MiriamPrayerSwordAttack_18.png")), this.getPosX(), this.getPosY());
+			stateTime += Gdx.graphics.getDeltaTime();
+			attackPatterns.get(0).attack(getChargingAttack(), stateTime, attackMovementTimer);
+			//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
+			batch.draw(attackPatterns.get(0).getAnimation().getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
+			//batch.draw(new Texture(Gdx.files.internal("MiriamPrayerSwordAttack_18.png")), this.getPosX(), this.getPosY());
 		}
 		else
 		{
@@ -215,7 +233,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	
 	public void renderAnimation(Animation<TextureRegion> animation, SpriteBatch batch)
 	{
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
+		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
 		stateTime += Gdx.graphics.getDeltaTime();
 		batch.draw(animation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 	}

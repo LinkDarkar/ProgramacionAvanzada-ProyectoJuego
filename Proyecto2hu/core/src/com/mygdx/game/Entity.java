@@ -19,7 +19,6 @@ public abstract class Entity
 		Neutral
 	}
 	
-	//igual tener otro que no reciba nada??
 	public Entity (Texture sprite)
 	{
 		this.shapeRenderer = new ShapeRenderer();	//Debug

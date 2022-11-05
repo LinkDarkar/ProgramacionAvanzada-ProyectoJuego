@@ -20,9 +20,19 @@ public abstract class Character<Move extends IMovement> extends Entity
 	private int health;		//vida: si es <= 0 se muere
 	private int posture;	//por si el combate está muy fácil, empezaría en 0
 	private int damage;
+	private int xvel;
+	private float knockbackCount = 0;
+	private float knockbackSpeed = 0;
 	
 	private Rectangle attackHitbox;						//registra las coordenadas de la hitbox de la espada
-	//cambiar nombre por CharacterState o State, el que quede mas guapo
+	/* A ver, me tengo que justifiacar en esto, la cosa es, que al menos en C#
+	 * se le pueden poner valores binarios a los enum de forma que todos los booleanos
+	 * que estén abajo, podrían ponerse en el mismo enum, ahorrándonos TODOS los booleans
+	 * que se están usando para controlar los estados del personaje.
+	 * Esto en Java no funciona igual aparentemente, y paso de seguir intentándolo,
+	 * pero solo que quería dejar claro que sabemos que esta forma da paso a más errores
+	 * y que es una muy mala forma de controlar los estados.
+	 * */
 	private CharacterState characterState = CharacterState.idle;	//indica lo que hará la hitbox de la espada cuando colisione contra algo
 	public enum CharacterState
 	{
@@ -33,15 +43,13 @@ public abstract class Character<Move extends IMovement> extends Entity
 		deflecting,
 		inKnockback,
 		dashing,
-		iFrames
+		iFrames,
+		lookingRight;
 	}
-	
+	private boolean chargingAttack = true;	//Esto solo lo usa el jefe, ya se, está mal y jode la encapsulación
 	private boolean hitboxCollisioned = false;
 	private boolean facingRight;
-	private int xvel;
 	private boolean canTakeKnockback = true;
-	private float knockbackCount = 0;
-	private float knockbackSpeed = 0;
 	private boolean knockbackDirection;
 	
 	public Character(Texture spriteTable, Texture sprite, Sound hurtSound, Sound succesfulDeflectSound, 
@@ -155,6 +163,10 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		return this.characterState;
 	}
+	public boolean getChargingAttack()
+	{
+		return this.chargingAttack;
+	}
 	public boolean getHitboxCollisioned ()
 	{
 		return this.hitboxCollisioned;
@@ -196,8 +208,12 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		this.hitboxCollisioned = hitboxCollisioned;
 	}
+	public void setChargingAttack (boolean chargingAttack)
+	{
+		this.chargingAttack = chargingAttack;
+	}
 	/**********************COMBATE****************************/
-	public abstract void attack (SpriteBatch batch, Character<?> enemyCharacter);
+	public abstract void attack (SpriteBatch batch, Character<?> enemyCharacter, boolean chargingAttack);
 	public abstract void deflect (SpriteBatch batch);
 	public abstract void walking (SpriteBatch batch);
 	public abstract void dashing (SpriteBatch batch);
@@ -208,6 +224,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		//en vez de flagear al agresor, debería flagearse a sí mismo
 		if (characterAggresor.getCharacterState() == CharacterState.attacking 
 				&& characterAggresor.attackHitbox.overlaps(this.getHitbox())
+				&& characterAggresor.getChargingAttack() == false
 				&& this.getHitboxCollisioned() == false)
 		{
 			if(getCharacterState() != CharacterState.deflecting)
@@ -287,10 +304,8 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public void renderFrame (SpriteBatch batch, Character<?> enemyCharacter)
 	{
 		this.attackHitbox.x = facingRight ? getPosX() + 50 : getPosX() - 50;
-		//System.out.println("hitbox width = "+ Float.toString(getHitboxWidth()));
-		//System.out.println("facing right: "+ getFacingRight());
-		System.out.println("posX: " + this.getPosX());
-		System.out.println("attackHitbox.x = "+ attackHitbox.x);
+		//System.out.println("posX: " + this.getPosX());
+		//System.out.println("attackHitbox.x = "+ attackHitbox.x);
 		this.attackHitbox.y = getPosY();
 		
 		collisionHit(enemyCharacter);
@@ -305,7 +320,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 
 				break;
 			case attacking:
-				attack(batch, enemyCharacter);
+				attack(batch, enemyCharacter,this.chargingAttack);
 				break;
 			case idle:
 				batch.draw(getSprite(), getHitbox().x, getHitbox().y);

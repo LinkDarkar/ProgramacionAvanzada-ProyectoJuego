@@ -3,7 +3,8 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 
-public class MoveSine implements IMovement {
+public class MoveSine implements IMovement
+{
 	private double current = 0;
 
 	@Override

@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 {	
-	/* variables que formarán partes de la importación
+	/* variables que formarán partes de la importación y el control
 	 * de las animaciones
 	 * */
 	private Texture auxTexture;						//donde se guarda el spritemap
@@ -24,7 +24,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	 * del jugador
 	 * */
 	private Animation<TextureRegion> attackAnimation;	//donde se guarda la animación
-	//private float stateTimeAttack = 0f;			//indicará a la función el frame que tendrá que mostrar
 	private final float ATTACK_FRAME_DURATION = 0.21f;	//duración de los frames de la animación
 	private int attackCooldownTimer;
 	private int attackCooldownTimerDefault = 24;	//tarda 24 frames en poder volver a atacar
@@ -33,16 +32,9 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private boolean attackInCooldown = false;		//indica si el ataque está en cooldown
 
 	/* variables que controlan los deflects
-	 * 
-	 * el stateTimeDeflect no hace nada por el momento, ya que la función
-	 * para la renderización de esta mierda solo usa el stateTimeAttack, así que dependiendo
-	 * de las animaciónes que estemos usando, puede que queramos tener un stateTime
-	 * general o tener que pasarle a la función de la renderización el stateTime
-	 * que queremos usar
 	 * */
 	private Sound deflectingSound;
 	private Animation<TextureRegion> deflectAnimation;
-	//private float stateTimeDeflect = 0f;				//esto no hace nada por el momento
 	private final float DEFLECT_FRAME_DURATION = 1f;	//duración de los frames de la animación
 	private int deflectTime = 0;
 	private int deflectTimeDefault = 13;
@@ -50,6 +42,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private int deflectCooldownTimerDefault = 20;
 	private boolean deflectInCooldown = false;
 	
+	/* variables que controlan el dash
+	 * */
 	private float dashTime = 0f;
 	private float dashTimeDefault = 0.12f;
 	private int dashCooldownTimer;
@@ -61,6 +55,9 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private Animation<TextureRegion> walkingAnimation;
 	private final float WALKING_FRAME_DURATION = 0.065f;	//duración de los frames de la animación
 
+
+
+//Constructores
 	public CharacterPlayer (Texture spriteTable, Texture sprite, Sound sound, Sound sound2, Sound sound3, 
 			String name, boolean canTakeKnockback, Move move)
 	{
@@ -95,6 +92,9 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		createDeflectAnimation();
 	}
 
+
+
+//Creación de elementos del jugador
 	public Rectangle createHitbox ()
 	{
 		Rectangle hitbox = new Rectangle();
@@ -168,6 +168,9 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		walkingAnimation.setPlayMode(PlayMode.LOOP);
 	}
 
+
+
+//Control del jugador
 	public void controlCharacterPlayer (SpriteBatch batch)
 	{
 		switch (getCharacterState())
@@ -236,10 +239,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 				break;
 		}
 
-		/* dato sobre esto: como esto está en controlCharacterPlayer,
-		 * y esto no se 
-		 * 
-		 * */
+		//podríamos dejar estos tres checks en una sola función cooldowns que haga lo mismo
 		if (attackInCooldown == true)
 		{
 			attackInCooldown = attackCooldownCheck();
@@ -257,7 +257,10 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		if(getHitbox().x > 800 - 64) getHitbox().x = 800 - 64;
 	}
 
-	public void attack (SpriteBatch batch, Character<?> enemyCharacter)
+
+
+//Control de animaciones y estados
+	public void attack (SpriteBatch batch, Character<?> enemyCharacter, boolean chargingAttack)
 	{
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
@@ -266,11 +269,13 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 			 * podría arreglar esto para que quede más bonito, no
 			 * lo voy a hacer hoy
 			 **/
+			setChargingAttack(false);
 			this.renderAnimation(attackAnimation, batch);
 		}
 		else
 		{
 			enemyCharacter.setHitboxCollisioned(false);
+			setChargingAttack(true);
 			setCharacterState(CharacterState.idle);
 			attackMovementTimer = 0;
 		}
@@ -328,18 +333,20 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		 * 
 		 * ya se que esta feo
 		 * */
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
+		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
 		stateTime += Gdx.graphics.getDeltaTime()*((float)getXvel()/100);
 		batch.draw(walkingAnimation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 	}
-	
 	public void renderAnimation(Animation<TextureRegion> animation, SpriteBatch batch)
 	{
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
+		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
 		stateTime += Gdx.graphics.getDeltaTime();
 		batch.draw(animation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 	}
-	
+
+
+
+//Cooldowns
 	public boolean attackCooldownCheck ()
 	{
 		attackCooldownTimer += 1;

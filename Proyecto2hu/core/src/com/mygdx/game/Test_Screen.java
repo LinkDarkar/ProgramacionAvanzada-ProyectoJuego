@@ -52,7 +52,7 @@ public class Test_Screen extends ScreenBase {
 		// crear enemigo
 		enemy = new CharacterBoss<MoveVectorial>(
 				new Texture(Gdx.files.internal("MiriamIdleAnim_0.png")),
-				new Texture(Gdx.files.internal("MiriamIdleAnim_0.png")),
+				new Texture(Gdx.files.internal("youmu attack 1.png")),
 				100, //hp
 				hurtSound,
 				"Miriam",

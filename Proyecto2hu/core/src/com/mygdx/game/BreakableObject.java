@@ -28,4 +28,10 @@ public class BreakableObject extends Entity
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void collisionHit(Character<?> character) {
+		// TODO Auto-generated method stub
+		
+	}
 }
