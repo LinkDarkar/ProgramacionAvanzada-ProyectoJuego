@@ -1,12 +1,19 @@
 package com.mygdx.game;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Entity.Team;
 
 public class Test_Screen extends ScreenBase {
@@ -38,7 +45,7 @@ public class Test_Screen extends ScreenBase {
 				new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")), // Textura
 				hurtSound, deflectingSound, succesfulDeflectSound, // Sonidos (deberían ser un arreglo mejor
 				"Youmu", // Nombre
-				50, // HP
+				100, // HP
 				Team.Player, // Equipo
 				true, // Puede recibir knockback?
 				new MoveByPixel()); // Tipo de movimiento
@@ -53,16 +60,7 @@ public class Test_Screen extends ScreenBase {
 		//player2.getHitbox().x = 100;
 		//player2.getHitbox().y = 100;
 
-		// crear enemigo
-		enemy = new CharacterBoss<MoveVectorial>(
-				new Texture(Gdx.files.internal("MiriamIdleAnim_0.png")),
-				new Texture(Gdx.files.internal("youmu attack 1.png")),
-				100, //hp
-				hurtSound,
-				"Miriam",
-				Team.IA,
-				true,
-				new MoveVectorial());
+		enemy = new CharacterBoss<MoveVectorial>(new BossData(0)); 
 
 		spawnAt(enemy, startingOffset, true);
 		

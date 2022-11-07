@@ -20,7 +20,7 @@ public class AttackPattern1 implements IAttack, IMovement
 	//private float velocity;
 	//y luego mierda
 
-	public AttackPattern (Texture texture, float ATTACK_FRAME_DURATION)
+	public AttackPattern1 (Texture texture, float ATTACK_FRAME_DURATION)
 	{
 		this.animation = createAnimation(texture, ATTACK_FRAME_DURATION);
 		this.hitboxActivationFrames = new int[1];
@@ -49,7 +49,6 @@ public class AttackPattern1 implements IAttack, IMovement
 		return this.animation;
 	}
 	
-	@Override
 	public void attack (boolean chargingAttack, float frameActual, int vel)
 	{
 		System.out.println("frame actual == "+ (int)frameActual);
@@ -105,5 +104,11 @@ public class AttackPattern1 implements IAttack, IMovement
 	{
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public int attack() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

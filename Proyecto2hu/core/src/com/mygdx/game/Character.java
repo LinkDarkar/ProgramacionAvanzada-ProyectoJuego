@@ -15,7 +15,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	private Move move;
 
 	//private Animation animation;
-	private Sound hurtSound;
+	private Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
 	private Sound succesfulDeflectSound;
 	
 	private String nombre;	//no se va a usar
@@ -43,11 +43,11 @@ public abstract class Character<Move extends IMovement> extends Entity
 		attacking,
 		blocking,
 		deflecting,
-		inKnockback,
 		dashing,
 		iFrames,
 		lookingRight;
 	}
+	private boolean inKnockback = false; 
 	private boolean chargingAttack = true;	//Esto solo lo usa el jefe, ya se, está mal y jode la encapsulación
 	private boolean facingRight;
 	private boolean canTakeKnockback = true;
@@ -72,14 +72,13 @@ public abstract class Character<Move extends IMovement> extends Entity
 		createAttackHitbox();
 	}
 	
-	public Character(Texture sprite, String name, Sound sound, int hp, boolean canTakeKnockback,
+	public Character(Texture sprite, String name, int hp, boolean canTakeKnockback,
 			Move move)
 	{
 		super(sprite);
 		this.swordHitboxTexture = new Texture("penitent_rangeAttack_projectile_anim_4.png");
 		this.nombre = name;
 		this.health = hp;
-		this.hurtSound = sound;
 		this.posture = 0;
 		this.facingRight = false;
 		this.xvel = 600;
@@ -160,6 +159,14 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		this.chargingAttack = chargingAttack;
 	}
+	public void setCanTakeKnockback (boolean canTakeKnockback)
+	{
+		this.canTakeKnockback = canTakeKnockback;
+	}
+	public void setInKnockback (boolean inKnockback)
+	{
+		this.inKnockback = inKnockback;
+	}
 	/**********************COMBATE****************************/
 	public abstract void attack (SpriteBatch batch, ArrayList<Entity> entitiesList);
 	public abstract void deflect (SpriteBatch batch);
@@ -170,26 +177,28 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public void collisionHit (Character<?> characterAggresor)
 	{
 		if (this.getTeam() == characterAggresor.getTeam()) return;
-		//System.out.println("Checking Collition Conditions");
-		//en vez de flagear al agresor, debería flagearse a sí mismo
 		if (characterAggresor.getCharacterState() == CharacterState.attacking && // Foe is attacking
 			characterAggresor.attackHitbox.overlaps(this.getHitbox()) && // The Hitbox is collisioning
 			characterAggresor.getChargingAttack() == false && // The hitbox is active
 			this.canGetHit() == true) // The unit can get hit
 		{
 			System.out.println("Collition Conditions met");
-			if(getCharacterState() == CharacterState.deflecting)
+			if(this.getCharacterState() == CharacterState.deflecting)
 			{
-				characterAggresor.takeKnockback(0.1f, 10, characterAggresor.getFacingRight());
+				this.takeKnockback(0.07f, 32, characterAggresor.getFacingRight());
 				this.setCanGetHit(false);
 				System.out.println("PARRY");
 				// SONIDO DE PARRY
-				succesfulDeflectSound.play(0.2f);
+				succesfulDeflectSound.play(0.1f);
+			}
+			else if (this.getCharacterState() == CharacterState.dashing)
+			{
+				this.setCanGetHit(false);
 			}
 			else
 			{
 				this.takeDamage(2);
-				if (canTakeKnockback) takeKnockback(0.2f, 50, characterAggresor.getFacingRight());
+				if (canTakeKnockback) takeKnockback(0.115f, 115, characterAggresor.getFacingRight());
 				this.setCanGetHit(false);
 				hurtSound.play(0.2f);
 				System.out.println("damageDone = true");
@@ -199,7 +208,8 @@ public abstract class Character<Move extends IMovement> extends Entity
 
 	public void takeKnockback(float seconds, float speed, boolean toTheRight)
 	{
-		characterState = CharacterState.inKnockback;
+		//characterState = CharacterState.inKnockback;
+		inKnockback = true;
 		knockbackSpeed = speed;
 		knockbackCount = seconds;
 		knockbackDirection = toTheRight;
@@ -240,7 +250,6 @@ public abstract class Character<Move extends IMovement> extends Entity
 	}
 	public void dash()
 	{
-		characterState = CharacterState.dashing;
 		if (facingRight == true)
 		{
 			move.moveRight(getHitbox(), xvel*4);
@@ -250,49 +259,6 @@ public abstract class Character<Move extends IMovement> extends Entity
 			move.moveLeft(getHitbox(), xvel*4);
 		}
 	}
-
-	/**********************ACTUALIZACION****************************/
-	/*public void renderFrame (SpriteBatch batch, Character<?> enemyCharacter)
-	{
-		this.attackHitbox.x = facingRight ? getPosX() + 50 : getPosX() - 50;
-		//System.out.println("posX: " + this.getPosX());
-		//System.out.println("attackHitbox.x = "+ attackHitbox.x);
-		this.attackHitbox.y = getPosY();
-		
-		collisionHit(enemyCharacter);
-		switch (characterState)
-		{
-			case inKnockback:
-				if (knockbackCount > 0)
-				{
-					moveKnockback();
-				}
-				else characterState = CharacterState.idle;
-
-				break;
-			case attacking:
-				attack(batch, enemyCharacter,this.chargingAttack);
-				break;
-			case idle:
-				batch.draw(getSprite(), getHitbox().x, getHitbox().y);
-				break;
-			case walking:
-				walking(batch);
-				break;
-			case deflecting:
-				deflect(batch);
-				break;
-			case dashing:
-				dashing(batch);
-				break;
-			default:
-				characterState = CharacterState.idle;
-				break;
-		}
-		
-		batch.draw(this.swordHitboxTexture, attackHitbox.x, attackHitbox.y);
-		//debugSwordHitboxViewerRender();
-	}*/
 	
 	public void renderFrame (SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
@@ -307,7 +273,15 @@ public abstract class Character<Move extends IMovement> extends Entity
 			if (entity == this) continue;
 			entity.collisionHit(this);
 		}
-		//collisionHit(enemyCharacter);
+
+		if (inKnockback == true)
+		{
+			if (knockbackCount > 0)
+			{
+				moveKnockback();
+			}
+			else inKnockback = false;
+		}
 		switch (characterState)
 		{
 			case idle:
@@ -317,18 +291,20 @@ public abstract class Character<Move extends IMovement> extends Entity
 				walking(batch);
 				break;
 			case attacking:
-				attack(batch, entitiesList); 
+				if (!inKnockback)
+				{
+					attack(batch, entitiesList);
+				}
+				else
+				{
+					setCharacterState(CharacterState.idle);
+				}
 				break;
 			case deflecting:
 				deflect(batch);
 				break;
 			case dashing:
 				dashing(batch);
-				break;
-			case inKnockback:
-				if (knockbackCount > 0) moveKnockback();
-				else characterState = CharacterState.idle;
-				
 				break;
 			default:
 				characterState = CharacterState.idle;

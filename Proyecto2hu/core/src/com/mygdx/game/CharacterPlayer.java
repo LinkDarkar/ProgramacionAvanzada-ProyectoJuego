@@ -82,7 +82,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	}
 	public void createAttackHitbox ()
 	{
-		//esto hará que el jugador haga daño conforme toque las cosas?
 		Rectangle attackHitbox = new Rectangle();
 		attackHitbox.height = 64;
 		attackHitbox.width = 64;
@@ -93,7 +92,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	}
 	public void createAttackHitboxDebug ()
 	{
-		//esto hará que el jugador haga daño conforme toque las cosas?
 		Rectangle attackHitbox = new Rectangle();
 		attackHitbox.height = 64;
 		attackHitbox.width = 64;
@@ -154,11 +152,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 				stateTime = 0f;
 			case walking:
 			{
-				//if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) && Gdx.input.isKeyPressed(Input.Keys.RIGHT)) || 
-				//		(Gdx.input.isKeyPressed(Input.Keys.LEFT) == false && Gdx.input.isKeyPressed(Input.Keys.RIGHT) == false))
-				
-				//el "^" es un operador llamado "XOR", el cual retorna true solo cuando una de las condiciones es True
-				//si ninguna o ambas lo son entonces retorna False
 				if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) ^ Gdx.input.isKeyPressed(Input.Keys.RIGHT)))
 				{
 					if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) setFacingDirection(false);
@@ -185,22 +178,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 				else if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT) && dashInCooldown == false)
 				{
 					dashInCooldown = true;
+					setInKnockback(false);
 					setCharacterState(CharacterState.dashing);
 				}
 				break;
 			}
-			/*case attacking:
-			{
-				//no se si deberíamos dejar lo de renderizar las animaciones en 
-				//CharacterPlayer o en Character, igual en Character queda un poco raro,
-				//pero bueno
-				//this.renderAnimation(testAttackAnimation, batch);
-				break;
-			}
-			case deflecting:
-			{
-				break;
-			}*/
 			default:
 				break;
 		}
@@ -231,15 +213,19 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
 			attackMovementTimer += 1;
-			/* esto es lo que realmente para a la animación, a ver						 
-			 * podría arreglar esto para que quede más bonito, no
-			 * lo voy a hacer hoy
-			 **/
 			setChargingAttack(false);
 			this.renderAnimation(attackAnimation, batch);
 		}
 		else
 		{
+			//este for se encarga de que al terminar el ataque las entidades puedan
+			//volver a golpearse
+			for (int index = 0 ; index < entitiesList.size() ; index++)
+			{
+				Entity entity = entitiesList.get(index);
+				if (entity == this) continue;
+				entity.setCanGetHit(true);
+			}
 			setChargingAttack(true);
 			setCharacterState(CharacterState.idle);
 			attackMovementTimer = 0;
@@ -256,10 +242,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 			else
 			{
 			}
-			deflectTime += 1;				/* esto es lo que realmente para a la animación, a ver
-											 * podría arreglar esto para que quede más bonito, no
-											 * lo voy a hacer hoy
-											 **/
+			deflectTime += 1;
 			this.renderAnimation(deflectAnimation, batch);
 		}
 		else
@@ -298,13 +281,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		 * 
 		 * ya se que esta feo
 		 * */
-		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
 		stateTime += Gdx.graphics.getDeltaTime()*((float)getXvel()/100);
 		batch.draw(walkingAnimation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 	}
 	public void renderAnimation(Animation<TextureRegion> animation, SpriteBatch batch)
 	{
-		//Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);	//limpia la pantalla
 		stateTime += Gdx.graphics.getDeltaTime();
 		batch.draw(animation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 	}

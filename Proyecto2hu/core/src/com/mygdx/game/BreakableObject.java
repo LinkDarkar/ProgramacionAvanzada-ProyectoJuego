@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -23,7 +25,6 @@ public class BreakableObject extends Entity
 		return null;
 	}
 
-	@Override
 	public void renderFrame(SpriteBatch batch, Character<?> character) {
 		// TODO Auto-generated method stub
 		
@@ -31,6 +32,12 @@ public class BreakableObject extends Entity
 
 	@Override
 	public void collisionHit(Character<?> character) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList) {
 		// TODO Auto-generated method stub
 		
 	}
