@@ -340,4 +340,10 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void changeAttackHitboxPosition(Rectangle attackHitbox)
+	{
+		attackHitbox.x = getFacingRight() ? getPosX() + 50 : getPosX() - 50;
+		attackHitbox.y = getPosY();
+	}
 }

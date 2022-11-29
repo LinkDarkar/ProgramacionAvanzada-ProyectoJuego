@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Character<Move extends IMovement> extends Entity
 {
-	Texture swordHitboxTexture;	//
+	Texture swordHitboxTexture;
 	private Move move;
 
 	//private Animation animation;
@@ -25,9 +25,9 @@ public abstract class Character<Move extends IMovement> extends Entity
 	private int xvel;
 	private float knockbackCount = 0;
 	private float knockbackSpeed = 0;
-	
 	private Rectangle attackHitbox;						//registra las coordenadas de la hitbox de la espada
-	/* A ver, me tengo que justifiacar en esto, la cosa es, que al menos en C#
+
+	/* A ver, me tengo que justifiacar en esto, la cosa es que, al menos en C#,
 	 * se le pueden poner valores binarios a los enum de forma que todos los booleanos
 	 * que estén abajo, podrían ponerse en el mismo enum, ahorrándonos TODOS los booleans
 	 * que se están usando para controlar los estados del personaje.
@@ -169,6 +169,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	}
 	/**********************COMBATE****************************/
 	public abstract void attack (SpriteBatch batch, ArrayList<Entity> entitiesList);
+	public abstract void changeAttackHitboxPosition (Rectangle attackHitbox);
 	public abstract void deflect (SpriteBatch batch);
 	public abstract void walking (SpriteBatch batch);
 	public abstract void dashing (SpriteBatch batch);
@@ -262,10 +263,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	
 	public void renderFrame (SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
-		this.attackHitbox.x = facingRight ? getPosX() + 50 : getPosX() - 50;
-		//System.out.println("posX: " + this.getPosX());
-		//System.out.println("attackHitbox.x = "+ attackHitbox.x);
-		this.attackHitbox.y = getPosY();
+		this.changeAttackHitboxPosition(this.attackHitbox);
 		
 		for (int index = 0 ; index < entitiesList.size() ; index++)
 		{
@@ -288,6 +286,8 @@ public abstract class Character<Move extends IMovement> extends Entity
 				batch.draw(getSprite(), getHitbox().x, getHitbox().y);
 				break;
 			case walking:
+				System.out.println("jugador x = "+ getHitbox().x);
+				System.out.println("jugador y = "+ getHitbox().y);
 				walking(batch);
 				break;
 			case attacking:

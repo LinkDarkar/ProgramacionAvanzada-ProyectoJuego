@@ -28,9 +28,8 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	/* variables que controlan los ataques
 	 * del personaje
 	 * */
-	private ArrayList<IAttack> attacksList;
-	private ArrayList<Animation<TextureRegion>> attackAnimation;	//donde se guarda la animación
-	//private float stateTimeAttack = 0f;			//indicará a la función el frame que tendrá que mostrar
+	private ArrayList<IAttack> attacksList;							//donde se guarda los datos de los ataques
+	private ArrayList<Animation<TextureRegion>> attackAnimation;	//donde se guarda la animación de los ataques
 	private int attackCooldownTimer;
 	private final int attackCooldownTimerDefault = 300;
 	private int currentAttack = 1;
@@ -65,6 +64,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 					stateTime = 0f;
 					attackInCooldown = true;
 					setCharacterState(CharacterState.attacking);
+					currentAttack = ThreadLocalRandom.current().nextInt(0, this.attacksList.size());
 					break;
 				}
 				
@@ -131,7 +131,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	public void attack(SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{		switch(attacksList.get(currentAttack).attack())
 		{
-			case 0: // The Attack Finished
+			case 0: // The attack finished
 				System.out.println("Case 0");
 				setChargingAttack(true);
 				setCharacterState(CharacterState.idle);
@@ -151,10 +151,13 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 				break;
 			case 2: // the attack hitbox is On
 				System.out.println("Case 2");
+				this.setAttackHitbox(attacksList.get(currentAttack).changeHitbox());
+				System.out.println("x = "+ getAttackHitbox().x);
+				System.out.println("y = "+ getAttackHitbox().y);
 				setChargingAttack(true);
 				break;
 			default:
-				System.out.println("Default Case");
+				//System.out.println("Default Case");
 				break;
 		}
 		renderAnimation(attackAnimation.get(currentAttack),batch);
@@ -213,5 +216,12 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 		if(ran > 99) this.setCharacterState(CharacterState.attacking);
 		else if(ran > 50) this.setCharacterState(CharacterState.walking);
 		//System.out.println("New AI State: "+getCharacterState());
+	}
+
+	public void changeAttackHitboxPosition(Rectangle attackHitbox)
+	{
+		attackHitbox.x = getFacingRight() ? getPosX() + getAttackHitbox().width : getPosX() - getAttackHitbox().width;
+		attackHitbox.y = getPosY();
+		
 	}
 }
