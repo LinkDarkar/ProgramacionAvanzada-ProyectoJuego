@@ -261,9 +261,10 @@ public abstract class Character<Move extends IMovement> extends Entity
 		}
 	}
 	
-	public void renderFrame (SpriteBatch batch, ArrayList<Entity> entitiesList)
+	public boolean renderFrame (SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
-		this.changeAttackHitboxPosition(this.attackHitbox);
+		if (health <= 0) return false;
+		changeAttackHitboxPosition(this.attackHitbox);
 		
 		for (int index = 0 ; index < entitiesList.size() ; index++)
 		{
@@ -286,8 +287,8 @@ public abstract class Character<Move extends IMovement> extends Entity
 				batch.draw(getSprite(), getHitbox().x, getHitbox().y);
 				break;
 			case walking:
-				System.out.println("jugador x = "+ getHitbox().x);
-				System.out.println("jugador y = "+ getHitbox().y);
+				//System.out.println("jugador x = "+ getHitbox().x);
+				//System.out.println("jugador y = "+ getHitbox().y);
 				walking(batch);
 				break;
 			case attacking:
@@ -313,6 +314,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		
 		batch.draw(this.swordHitboxTexture, attackHitbox.x, attackHitbox.y);
 		//debugSwordHitboxViewerRender();
+		return true;
 	}
 	
 	protected void allowOtherUnitsToGetHit(ArrayList<Entity> entitiesList)

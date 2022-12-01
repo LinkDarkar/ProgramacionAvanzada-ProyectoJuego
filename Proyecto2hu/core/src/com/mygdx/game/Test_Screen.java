@@ -24,7 +24,7 @@ public class Test_Screen extends ScreenBase {
 	private ArrayList<Projectile> projectilesList;
 	private int startingPos = 60;
 	private float timeCounter = 0;
-	
+
 	ArrayList<Entity> listOfEntities;
 
 	// Se ejecuta siempre que se llege a esta pantalla
@@ -72,19 +72,19 @@ public class Test_Screen extends ScreenBase {
 		
 		// Creates 2 individual new projectiles to test
 		projectilesList.add(new Projectile<MoveByPixel>(
-				new Texture(Gdx.files.internal("ProjectileTest.png")),
+				new Texture(Gdx.files.internal("Proyectil_4.png")),
 				Team.IA,
-				1,
+				10,
 				3,
 				2,
 				false,
 				new MoveByPixel()));
 		System.out.println("Proyectile Created");
 		projectilesList.add(new Projectile<MoveSine>(
-				new Texture(Gdx.files.internal("ProjectileTest.png")),
+				new Texture(Gdx.files.internal("Proyectil_1.png")),
 				Team.IA,
-				0.1f,
-				3,
+				1f,
+				10f,
 				2,
 				false,
 				new MoveSine()));
@@ -104,14 +104,20 @@ public class Test_Screen extends ScreenBase {
 		//if (player.getHealth() > 0) player.renderFrame(getBatch(), enemy);
 		//if (enemy.getHealth() > 0) enemy.renderFrame(getBatch(), player);
 		
-		if (player.getHealth() > 0) player.renderFrame(getBatch(), listOfEntities);
-		else listOfEntities.remove(player);
-		if (enemy.getHealth() > 0) enemy.renderFrame(getBatch(), listOfEntities);
-		else listOfEntities.remove(enemy);
+		if (!player.renderFrame(getBatch(), listOfEntities))
+		{
+			listOfEntities.remove(player);
+			//dispose();
+		}
+		if (!enemy.renderFrame(getBatch(), listOfEntities))
+		{
+			listOfEntities.remove(enemy);
+			//dispose();
+		}
 
 		for (int i = 0 ; i < projectilesList.size() ; i++)
 		{
-			Projectile<?> currentPro = projectilesList.get(i);
+			Projectile<?> currentProjectile = projectilesList.get(i);
 			/*
 			if(currentPro.checkCollision(player))
 			{
@@ -123,7 +129,11 @@ public class Test_Screen extends ScreenBase {
 				projectilesList.remove(i);
 				continue;
 			}*/
-			currentPro.renderFrame(getBatch(), null);
+			if(!currentProjectile.renderFrame(getBatch(), null))
+			{
+				projectilesList.remove(i);
+				continue;
+			}
 			//System.out.println("Proyectile Drawn");
 		}
 		//player2.renderFrame(getBatch());

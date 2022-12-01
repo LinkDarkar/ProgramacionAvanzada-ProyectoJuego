@@ -82,7 +82,7 @@ public abstract class Entity
 	}
 	
 	public abstract Rectangle createHitbox();
-	public abstract void renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList);
+	public abstract boolean renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList);
 	public abstract void collisionHit(Character<?> character);
 	
 	/**********************DEBUG****************************/

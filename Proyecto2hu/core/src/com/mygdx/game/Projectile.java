@@ -2,36 +2,19 @@ package com.mygdx.game;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Projectile<Move extends IMovement> extends Entity
 {
-	private Move move;
-	private float speed = 1;
-	private float aliveTime = 1;
-	private int damage = 1;
-	private boolean movingRight;
+	private Move move; // Como se mueve
+	private float speed = 1; // Velocidad/Aceleración
+	private float aliveTime = 500; // Tiempo que durará vivo en milisegundos
+	private int damage = 1; // Daño que realizará
+	private boolean movingRight; // Dirección de movimiento (false = Izquierda, true = Derecha)
 	
-	public Projectile(Texture sprite, boolean movingRight, Move move) {
-		super(sprite);
-		this.movingRight = movingRight;
-		this.move = move;
-	}
-	public Projectile(Texture sprite, float speed, float time, int damage, boolean movingRight, Move move) {
-		super(sprite);
-		this.speed = speed;
-		this.aliveTime = time;
-		this.damage = damage;
-		this.movingRight = movingRight;
-		this.move = move;
-	}
-	public Projectile(Texture sprite, Team team, boolean movingRight, Move move) {
-		super(sprite, team);
-		this.movingRight = movingRight;
-		this.move = move;
-	}
 	public Projectile(Texture sprite, Team team, float speed, float time, int damage, boolean movingRight, Move move) {
 		super(sprite, team);
 		this.speed = speed;
@@ -79,11 +62,16 @@ public class Projectile<Move extends IMovement> extends Entity
 	}
 
 	//@Override
-	public void renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList)
+	public boolean renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
 		if(movingRight) move.moveRight(getHitbox(), speed);
 		else move.moveLeft(getHitbox(), speed);
+		aliveTime -= Gdx.graphics.getDeltaTime();
+		System.out.println("Projectile Time Left "+aliveTime);
+		if (aliveTime <= 0) return false;
 		batch.draw(getSprite(), getHitbox().x, getHitbox().y );
+		return true;
+
 	}
 	public boolean checkCollision(Character<?> character)
 	{
