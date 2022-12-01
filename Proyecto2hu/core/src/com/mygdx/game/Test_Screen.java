@@ -75,7 +75,7 @@ public class Test_Screen extends ScreenBase {
 				new Texture(Gdx.files.internal("Proyectil_4.png")),
 				Team.IA,
 				10,
-				3,
+				100,
 				2,
 				false,
 				new MoveByPixel()));
@@ -83,11 +83,22 @@ public class Test_Screen extends ScreenBase {
 		projectilesList.add(new Projectile<MoveSine>(
 				new Texture(Gdx.files.internal("Proyectil_1.png")),
 				Team.IA,
-				1f,
+				0,
 				10f,
 				2,
 				false,
 				new MoveSine()));
+		System.out.println("Proyectile Created");
+		
+		// Creating the Tree of Doom
+		projectilesList.add(new Projectile<MoveByPixel>(
+				new Texture(Gdx.files.internal("ProjectileTest.png")),
+				Team.IA,
+				10,
+				10f,
+				2,
+				false,
+				new MoveByPixel()));
 		System.out.println("Proyectile Created");
 		
 		for (int i = 0 ; i < projectilesList.size() ; i++)
@@ -131,7 +142,12 @@ public class Test_Screen extends ScreenBase {
 			}*/
 			if(!currentProjectile.renderFrame(getBatch(), null))
 			{
-				projectilesList.remove(i);
+				System.out.println("Removiendo Projectil");
+				projectilesList.remove(currentProjectile);
+				listOfEntities.remove(currentProjectile);
+				currentProjectile.dispose();
+				//dispose(currentProjectile);
+				i--;
 				continue;
 			}
 			//System.out.println("Proyectile Drawn");
@@ -187,5 +203,12 @@ public class Test_Screen extends ScreenBase {
 	private void spawnAt(Entity entity, int x, int y)
 	{
 		entity.moveTo(x, y);
+	}
+	
+	@Override
+	public void dispose() {
+		// Recorre lista de eliminados
+		// dispose(elemento);
+
 	}
 }

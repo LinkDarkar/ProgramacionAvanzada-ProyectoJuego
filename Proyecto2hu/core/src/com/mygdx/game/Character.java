@@ -175,11 +175,16 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public abstract void dashing (SpriteBatch batch);
 	//igual el de abajo debería de ser un boolean para que si retorna false recibe un golpe
 	public abstract void blockOrDeflect ();
+	
+	public boolean attackHitboxOverlaps (Rectangle affectedHitbox)
+	{
+		return this.getAttackHitbox().overlaps(affectedHitbox);
+	}
 	public void collisionHit (Character<?> characterAggresor)
 	{
 		if (this.getTeam() == characterAggresor.getTeam()) return;
 		if (characterAggresor.getCharacterState() == CharacterState.attacking && // Foe is attacking
-			characterAggresor.attackHitbox.overlaps(this.getHitbox()) && // The Hitbox is collisioning
+			characterAggresor.attackHitboxOverlaps(this.getHitbox()) && // The Hitbox is collisioning
 			characterAggresor.getChargingAttack() == false && // The hitbox is active
 			this.canGetHit() == true) // The unit can get hit
 		{

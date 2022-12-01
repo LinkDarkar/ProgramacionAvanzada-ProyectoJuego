@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public abstract class Entity
@@ -44,6 +45,16 @@ public abstract class Entity
 		this.team = team;
 		
 		//this.canGetHitList = new ArrayList<Entity>(); 
+	}
+	
+	public void drawEntity (SpriteBatch batch, TextureRegion texture, boolean facingRight, float posX, float posY)
+	{
+		batch.draw(texture, facingRight ? posX : posX+texture.getRegionWidth(),posY, facingRight ? texture.getRegionWidth() : texture.getRegionWidth(), texture.getRegionWidth());
+	}
+	
+	public boolean hitboxOverlaps (Rectangle attackingHitbox)
+	{
+		return this.getHitbox().overlaps(attackingHitbox);
 	}
 	
 	public Rectangle getHitbox()
@@ -95,5 +106,10 @@ public abstract class Entity
 	public ShapeRenderer getShapeRenderer()
 	{
 		return this.shapeRenderer;
+	}
+	public void dispose()
+	{
+		hitbox = null;
+		sprite.dispose();
 	}
 }
