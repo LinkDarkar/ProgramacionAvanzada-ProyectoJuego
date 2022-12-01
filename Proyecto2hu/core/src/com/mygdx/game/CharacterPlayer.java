@@ -25,11 +25,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 	 * variables que controlan los ataques del jugador
 	 */
 	private Animation<TextureRegion> attackAnimation; // donde se guarda la animación
-	private final float ATTACK_FRAME_DURATION = 0.21f; // duración de los frames de la animación
+	private final float ATTACK_FRAME_DURATION = 0.11f; // duración de los frames de la animación
 	private int attackCooldownTimer;
-	private int attackCooldownTimerDefault = 24; // tarda 24 frames en poder volver a atacar
+	private int attackCooldownTimerDefault = 19; // tarda 24 frames en poder volver a atacar
 	private int attackMovementTimer;
-	private int attackMovementTimerDefault = 28; // tarda 28 frames en poder volver a moverse
+	private int attackMovementTimerDefault = 25; // tarda 28 frames en poder volver a moverse
 	private boolean attackInCooldown = false; // indica si el ataque está en cooldown
 
 	/*
@@ -101,8 +101,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 	}
 
 	public void createTestAttackAnimation() {
-		auxTexture = new Texture("youmu attack 1.png");
-		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, 64, 64);
+		auxTexture = new Texture("plAttack.png");
+		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, 92, 64);
 
 		auxAnimationFrames = new TextureRegion[4];
 		for (int index = 0; index < 4; index += 1) {
@@ -255,7 +255,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 				getPosY(), getFacingRight() ? 64 : -64, 64);
 	}
 
-	public void renderAnimation(Animation<TextureRegion> animation, SpriteBatch batch) {
+	public void renderAnimation(Animation<TextureRegion> animation, SpriteBatch batch)
+	{
 		stateTime += Gdx.graphics.getDeltaTime();
 		batch.draw(animation.getKeyFrame(stateTime, true), getFacingRight() ? getPosX() : getPosX() + 64, getPosY(),
 				getFacingRight() ? 64 : -64, 64);
