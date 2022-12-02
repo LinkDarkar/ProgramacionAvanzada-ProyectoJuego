@@ -21,9 +21,9 @@ public class CharacterPlayer extends Character
 	private boolean playAttackSound = true;
 	private Animation<TextureRegion> attackAnimation; // donde se guarda la animación
 	private int attackCooldownTimer;
-	private int attackCooldownTimerDefault = 19; // tarda 24 frames en poder volver a atacar
+	private int attackCooldownTimerDefault = 19;
 	private int attackMovementTimer;
-	private int attackMovementTimerDefault = 25; // tarda 28 frames en poder volver a moverse
+	private int attackMovementTimerDefault = 19;
 	private boolean attackInCooldown = false; // indica si el ataque está en cooldown
 
 	/*

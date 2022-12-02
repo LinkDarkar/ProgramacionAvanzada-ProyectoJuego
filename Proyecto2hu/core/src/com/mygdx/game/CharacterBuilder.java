@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.Entity.Team;
 
-public class CharacterBuilder
+public class CharacterBuilder implements ICharacterTest
 {
 	private Texture auxTexture; // donde se guarda el spritemap
 	TextureRegion[] auxAnimationFrames; // donde se guardan los frames

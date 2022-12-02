@@ -23,12 +23,10 @@ public class CharacterBoss extends Character
 	private boolean playAttackSound = true;
 	private ArrayList<IAttack> attacksList;							//donde se guarda los datos de los ataques
 	private ArrayList<Animation<TextureRegion>> attackAnimation;	//donde se guarda la animación de los ataques
-	private int attackCooldownTimer;
-	private int attackCooldownTimerDefault = 300; // tarda 24 frames en poder volver a atacar
 	private int attackMovementTimer;
-	private int attackMovementTimerDefault = 25; // tarda 28 frames en poder volver a moverse
+	private int attackMovementTimerDefault = 60;
 	private boolean attackInCooldown = false; // indica si el ataque está en cooldown
-	private int currentAttack = 1;
+	private int currentAttack = 0;
 	private float hitsTakenRecently = 0;
 	private float resetHitsTimer = 0;
 	private boolean moveForward;
@@ -131,12 +129,13 @@ public class CharacterBoss extends Character
 		 * */
 		if (attackInCooldown == true)
 		{
-			attackInCooldown = attackCooldownCheck();
+			attackInCooldown = attackMovementCooldownCheck();
 		}
 		
 		if (getHitboxPosition_X() < 20) setHitboxPosition_X(20);
 		if (getHitboxPosition_X() > 780 - getHitboxWidth()) setHitboxPosition_X(780 - getHitboxWidth());
 	}
+
 	public void collisionHit (Character characterAggresor)
 	{
 		if (this.getTeam() == characterAggresor.getTeam()) return;
@@ -146,7 +145,9 @@ public class CharacterBoss extends Character
 			this.canGetHit() == true) // The unit can get hit
 		{
 			System.out.println("Collition Conditions met");
-			if (ThreadLocalRandom.current().nextInt(1, 11) == 2 || hitsTakenRecently > 2) setCharacterState(CharacterState.deflecting);
+			if ((ThreadLocalRandom.current().nextInt(1, 11) == 2 || hitsTakenRecently > 4)
+					&& (this.getCharacterState() != CharacterState.attacking))
+				setCharacterState(CharacterState.deflecting);
 			if(this.getCharacterState() == CharacterState.deflecting)
 			{
 				this.takeKnockback(0.07f, 32, characterAggresor.getFacingRight());
@@ -155,6 +156,7 @@ public class CharacterBoss extends Character
 				// SONIDO DE PARRY
 				//succesfulDeflectSound.play(0.1f);
 				deflectingSound.play(.1f);
+				hitsTakenRecently++;
 			}
 			else if (this.getCharacterState() == CharacterState.dashing)
 			{
@@ -166,7 +168,7 @@ public class CharacterBoss extends Character
 				resetHitsTimer = 2f;
 				this.takeDamage(2);
 				this.setCanGetHit(false);
-				//hurtSound.play(0.2f);
+				this.getHurtSound().play(0.2f);
 				System.out.println("damageDone = true");
 			}
 		}
@@ -189,7 +191,6 @@ public class CharacterBoss extends Character
 				System.out.println("Case 0");
 				setChargingAttack(true);
 				setCharacterState(CharacterState.idle);
-				attackInCooldown = false;
 				//renderAnimation(attackAnimation, batch);
 				break;
 			case 1: // the attack hitbox is Off but not finished
@@ -214,7 +215,10 @@ public class CharacterBoss extends Character
 				//System.out.println("Default Case");
 				break;
 		}
-		renderAnimation(attackAnimation.get(currentAttack),batch);
+		if (this.getCharacterState() == CharacterState.attacking)
+		{
+			renderAnimation(attackAnimation.get(currentAttack),batch);
+		}
 		/*
 		if (attackMovementTimer < attackMovementTimerDefault)
 		{
@@ -269,12 +273,12 @@ public class CharacterBoss extends Character
 		batch.draw(animation.getKeyFrame(stateTime, true),getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 	}
 
-	public boolean attackCooldownCheck ()
+	public boolean attackMovementCooldownCheck ()
 	{
-		attackCooldownTimer += 1;
-		if (attackCooldownTimer >= attackCooldownTimerDefault)
+		attackMovementTimer += 1;
+		if (attackMovementTimer >= attackMovementTimerDefault)
 		{
-			attackCooldownTimer = 0;
+			attackMovementTimer = 0;
 			return false;
 		}
 		
@@ -294,13 +298,19 @@ public class CharacterBoss extends Character
 	
 	public void randomState()
 	{
-		if (attackInCooldown) return;
+		if (attackInCooldown == true) return;
 		int ran = ThreadLocalRandom.current().nextInt(1, 101);
 		if(ran > 50)
 		{
 			// Rolear dado para Mele o Distancia
 			int ranA = ThreadLocalRandom.current().nextInt(1,2);
-			if (ranA < 2 && getDistanceFromFoe() < 105) this.setCharacterState(CharacterState.attacking); // Attacks
+			if (ranA < 2 && getDistanceFromFoe() < 105)
+			{
+				this.setCharacterState(CharacterState.attacking); // Attacks
+				currentAttack = ThreadLocalRandom.current().nextInt(0, this.attacksList.size());
+				attackInCooldown = true;
+			}
+				
 			//else Ranged Attack
 		}
 		else if(ran > 30) // Moves

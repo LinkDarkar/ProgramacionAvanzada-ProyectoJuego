@@ -30,6 +30,7 @@ public class AttackPattern implements IAttack
 		if (timer >= timerDefault)
 		{
 			// Attack Finished
+			System.out.println("se termina el ataque");
 			timer = 0;
 			return 0;
 		}

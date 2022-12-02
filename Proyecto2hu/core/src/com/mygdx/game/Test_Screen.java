@@ -42,7 +42,7 @@ public class Test_Screen extends ScreenBase {
 		//player2.getHitbox().x = 100;
 		//player2.getHitbox().y = 100;
 
-		enemy = new CharacterBoss(new BossData(0), 800, 20); 
+		enemy = new CharacterBoss(new BossData(0), 800, 20);
 		
 		enemy.setFoe(player);
 

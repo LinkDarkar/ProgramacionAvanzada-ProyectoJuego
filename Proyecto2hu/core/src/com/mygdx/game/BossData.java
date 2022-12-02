@@ -24,15 +24,15 @@ public class BossData
 		{
 			case 0:
 				//{framesDeDuracion,fasesAtaque(N)(siempre es par),frame1,...,frameN}
-				int [][] auxAttackPatternData = {{40,4,10,20,35,39},{150,6,20,30,65,70,90,100}};
+				int [][] auxAttackPatternData = {{50,2,32,34}};
 				//{{dimX1,dimY1},...,{dimXN,dimYN}}
-				int [][][] auxAttackPatternHitbox = {{{40,20},{100,50}},{{40,20},{100,50},{150,100}}};
+				int [][][] auxAttackPatternHitbox = {{{40,20},{100,50}}};
 				//{SpriteMap,DimensionX,DimensionY,tiempoDuracionPorFrame}
-				Object[][] auxAttackAnimationData = {{"reisenAttackKick.png",64,64,4,0.21f},{"reisenAttackKick.png",64,64,4,2f}};
+				Object[][] auxAttackAnimationData = {{"reisenAttackKick.png",64,64,6,0.11f}};
 				this.name = "Miriam";
 				this.idle = new Texture(Gdx.files.internal("MiriamIdleAnim_0.png"));
 				this.hp = 100;
-				this.amountAttacks = 2;
+				this.amountAttacks = 1;
 				this.attackPatternData = auxAttackPatternData;
 				this.attackAnimationData = auxAttackAnimationData;
 				this.attackPatternHitboxData = auxAttackPatternHitbox;
@@ -117,7 +117,7 @@ public class BossData
 			float frameDuration = (float) attackAnimationData[cont][4];
 			TextureRegion[][] tmpFrames = TextureRegion.split(spriteTable,xDim,yDim);
 			TextureRegion[] auxAnimationFrames = new TextureRegion[amountOfFrames];
-			for (int index = 0; index < 4; index += 1)
+			for (int index = 0; index < auxAnimationFrames.length; index += 1)
 			{
 				auxAnimationFrames[index] = tmpFrames[0][index];
 			}
