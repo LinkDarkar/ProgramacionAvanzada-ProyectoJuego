@@ -9,10 +9,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
-public abstract class Character<Move extends IMovement> extends Entity
+public abstract class Character extends Entity
 {
 	Texture swordHitboxTexture;
-	private Move move;
+	private IMovement move;
 
 	//private Animation animation;
 	private Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
@@ -53,7 +53,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	private boolean knockbackDirection;
 	
 	public Character(Texture sprite, Sound hurtSound, Sound succesfulDeflectSound,
-			String name, int health, Team team, boolean canTakeKnockback, Move move,
+			String name, int health, Team team, boolean canTakeKnockback, IMovement move,
 			float initialPosX, float initialPosY)
 	{
 		super(sprite, team, initialPosX, initialPosY);
@@ -67,13 +67,13 @@ public abstract class Character<Move extends IMovement> extends Entity
 		this.facingRight = true;
 		this.xvel = 130;
 		this.canTakeKnockback = canTakeKnockback;
-		this.move = move;
+		this.move = move == null ? new MoveByPixel() : move;
 	
 		createAttackHitbox();
 	}
 	
 	public Character(Texture sprite, String name, int health, boolean canTakeKnockback,
-			Move move, float initialPosX, float initialPosY)
+			IMovement move, float initialPosX, float initialPosY)
 	{
 		super(sprite,initialPosX,initialPosY);
 		this.swordHitboxTexture = new Texture("penitent_rangeAttack_projectile_anim_4.png");
@@ -83,7 +83,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		this.facingRight = false;
 		this.xvel = 600;
 		this.canTakeKnockback = canTakeKnockback;
-		this.move = move;
+		this.move = move == null ? new MoveByPixel() : move;
 		
 		createAttackHitbox();
 	}
@@ -129,10 +129,6 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public float getPosY()
 	{
 		return getHitbox().y;
-	}
-	public Move getMove()
-	{
-		return move;
 	}
 	public Sound getSuccesfulDeflectSound ()
 	{
@@ -184,7 +180,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	{
 		return this.getAttackHitbox().overlaps(affectedHitbox);
 	}
-	public void collisionHit (Character<?> characterAggresor)
+	public void collisionHit (Character characterAggresor)
 	{
 		if (this.getTeam() == characterAggresor.getTeam()) return;
 		if (characterAggresor.getCharacterState() == CharacterState.attacking && // Foe is attacking

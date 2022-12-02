@@ -7,7 +7,7 @@ public class Screen_Menu extends ScreenBase {
 	// Se ejecuta siempre que se llege a esta pantalla
 	public Screen_Menu(Proyecto2hu game) {
 		super(game);
-		ScreenBase.Instance = this;
+		setInstance(this);
 	}
 	
 	public void ManageFont()

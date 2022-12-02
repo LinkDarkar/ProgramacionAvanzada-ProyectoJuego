@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Projectile<Move extends IMovement> extends Entity
+public class Projectile extends Entity
 {
-	private Move move; // Como se mueve
+	private IMovement move; // Como se mueve
 	private float speed = 100; // Velocidad/Aceleración
 	private float aliveTime = 1000; // Tiempo que durará vivo en milisegundos
 	private int damage = 1; // Daño que realizará
@@ -17,7 +17,7 @@ public class Projectile<Move extends IMovement> extends Entity
 	//private int pierceAmount = 0; // Cantidad de entidades que puede atravezar. 0 Significa que se destruye con el primer impacto
 	
 	public Projectile(Texture sprite, Team team, float speed, float time,
-			int damage, boolean movingRight, Move move, float initialPosX, float initialPosY)
+			int damage, boolean movingRight, IMovement move, float initialPosX, float initialPosY)
 	{
 		super(sprite, team, initialPosX, initialPosY);
 		this.speed = speed;
@@ -85,7 +85,7 @@ public class Projectile<Move extends IMovement> extends Entity
 		return true;
 	}
 	@Override
-	public void collisionHit(Character<?> character)
+	public void collisionHit(Character character)
 	{
 		if (character == null || character.getTeam() == getTeam() || getTeam() == Team.Neutral) return;
 		// Verifica si la espada está golpeando

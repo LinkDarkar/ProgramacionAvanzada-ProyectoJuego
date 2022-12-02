@@ -5,20 +5,20 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
-public class CharacterPlayer<Move extends IMovement> extends Character<Move>
+public class CharacterPlayer extends Character
 {
 	private float stateTime = 0f; // indicará al renderAnimation el frame que tiene que mostrar
 
 	/*
 	 * variables que controlan los ataques del jugador
 	 */
+	private Sound attackSound = Gdx.audio.newSound(Gdx.files.internal("false_knight_swing.wav"));
+	private boolean playAttackSound = true;
 	private Animation<TextureRegion> attackAnimation; // donde se guarda la animación
 	private int attackCooldownTimer;
 	private int attackCooldownTimerDefault = 19; // tarda 24 frames en poder volver a atacar
@@ -52,7 +52,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 	private Animation<TextureRegion> walkingAnimation;
 
 //Constructores
-	public CharacterPlayer(CharacterBuilder characterBuilder, Move move, float initialPosX, float initialPosY)
+	public CharacterPlayer(CharacterBuilder characterBuilder, IMovement move, float initialPosX, float initialPosY)
 	{
 		super(characterBuilder.getSprite(), characterBuilder.getHurtSound(), characterBuilder.getSuccesfulDeflectSount(), 
 				characterBuilder.getName(), characterBuilder.getHealth(), characterBuilder.getTeam(),
@@ -155,10 +155,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 			dashInCooldown = dashCooldownCheck();
 		}
 
-		if (getHitboxPosition_X() < 0)
-			setHitboxPosition_X(0);
-		if (getHitboxPosition_X() > 800 - getHitboxWidth())
-			setHitboxPosition_X(800 - getHitboxWidth());
+		if (getHitboxPosition_X() < 0) setHitboxPosition_X(0);
+		if (getHitboxPosition_X() > 800 - getHitboxWidth()) setHitboxPosition_X(800 - getHitboxWidth());
 	}
 
 //Control de animaciones y estados
@@ -168,6 +166,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 		{
 			attackMovementTimer += 1;
 			setChargingAttack(false);
+			if (playAttackSound)
+			{
+				attackSound.play(.5f);
+				playAttackSound = false;
+			}
 			this.renderAnimation(attackAnimation, batch);
 		}
 		else
@@ -182,6 +185,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move>
 				entity.setCanGetHit(true);
 			}
 			setChargingAttack(true);
+			playAttackSound = true;
 			setCharacterState(CharacterState.idle);
 			attackMovementTimer = 0;
 		}

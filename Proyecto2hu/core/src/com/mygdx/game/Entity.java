@@ -146,7 +146,7 @@ public abstract class Entity
 		batch.draw(getSprite(), getHitboxPosition_X(), getHitboxPosition_Y());
 		return true;
 	}
-	public abstract void collisionHit(Character<?> character);
+	public abstract void collisionHit(Character character);
 	
 	/**********************DEBUG****************************/
 	public void debugHitboxViewerRender ()

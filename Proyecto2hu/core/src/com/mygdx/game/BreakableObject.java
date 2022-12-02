@@ -5,16 +5,16 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class BreakableObject extends Entity
 {
-	public BreakableObject(Texture sprite, float initialPosX, float initialPosY)
+	public BreakableObject(Texture sprite, int health, float initialPosX, float initialPosY)
 	{
 		super(sprite, initialPosX, initialPosY);
-		setHealth(5);
+		setHealth(health);
 	}
 	
 	
 	
 	@Override
-	public void collisionHit(Character<?> character) {
+	public void collisionHit(Character character) {
 		if (character == null || character.getTeam() == getTeam()) return;
 		switch(character.getCharacterState())
 		{
@@ -23,6 +23,7 @@ public class BreakableObject extends Entity
 					character.getChargingAttack() == false && // The hitbox is active
 					this.canGetHit() == true) // The unit can get hit)
 				{
+					setCanGetHit(false);
 					takeDamage(1, 0);
 				}
 				break;

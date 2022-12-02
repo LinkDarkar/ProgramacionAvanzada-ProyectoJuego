@@ -1,7 +1,5 @@
 package com.mygdx.game;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
@@ -11,27 +9,27 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Entity.Team;
 
 public class Test_Screen extends ScreenBase {
-	private CharacterPlayer<MoveByPixel> player;
+	private CharacterPlayer player;
 	//private CharacterPlayer<MoveCircle> player2;
-	private CharacterBoss<MoveVectorial> enemy;
+	private CharacterBoss enemy;
 	private int startingHeight = 60;
 	private float timeCounter = 0;
 	private float returningCount = 3;
-	private int minimumBreakableObjects = 3;
-	private int maximumBreakableObjects = 7;
+	//private int minimumBreakableObjects = 3;
+	//private int maximumBreakableObjects = 7;
 
 	// Se ejecuta siempre que se llege a esta pantalla
 	public Test_Screen(Proyecto2hu game)
 	{
 		super(game);
-		ScreenBase.Instance = this;
+		setInstance(this);
 		int startingOffset = 200;
 		Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
 		Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
 		Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
 
 		// Creates a Player Entity
-		player = new CharacterPlayer<MoveByPixel>(new CharacterBuilder(),
+		player = new CharacterPlayer(new CharacterBuilder(),
 				new MoveByPixel(), 400, 20); // Tipo de movimiento
 
 		spawnAt(player, startingOffset, startingHeight, false);
@@ -44,7 +42,9 @@ public class Test_Screen extends ScreenBase {
 		//player2.getHitbox().x = 100;
 		//player2.getHitbox().y = 100;
 
-		enemy = new CharacterBoss<MoveVectorial>(new BossData(0), 800, 20); 
+		enemy = new CharacterBoss(new BossData(0), 800, 20); 
+		
+		enemy.setFoe(player);
 
 		spawnAt(enemy, startingOffset, startingHeight, true);
 		
@@ -53,9 +53,8 @@ public class Test_Screen extends ScreenBase {
 		// Creates the new Projectiles List
 		//projectilesList = new ArrayList<Projectile>();
 		
-		
 		// Creates 2 individual new projectiles to test
-		addEntity(new Projectile<MoveByPixel>(
+		addEntity(new Projectile(
 				new Texture(Gdx.files.internal("Proyectil_4.png")),
 				Team.IA,
 				500,
@@ -64,7 +63,7 @@ public class Test_Screen extends ScreenBase {
 				false,
 				new MoveByPixel(), enemy.getPosX(), enemy.getPosY()));
 		System.out.println("Proyectile Created");
-		addEntity(new Projectile<MoveSine>(
+		addEntity(new Projectile(
 				new Texture(Gdx.files.internal("Proyectil_1.png")),
 				Team.IA,
 				0,
@@ -75,7 +74,7 @@ public class Test_Screen extends ScreenBase {
 		System.out.println("Proyectile Created");
 		
 		// Creating the Tree of Doom
-		addEntity(new Projectile<MoveByPixel>(
+		addEntity(new Projectile(
 				new Texture(Gdx.files.internal("ProjectileTest.png")),
 				Team.Neutral,
 				10,
@@ -89,13 +88,26 @@ public class Test_Screen extends ScreenBase {
 		{
 			listOfEntities.add(projectilesList.get(i));
 		}*/
+		/*ArrayList<String> boTexturesList = new ArrayList<String>();
+		boTexturesList.add("Barril_1.png");
+		boTexturesList.add("Barril_2.png");
+		boTexturesList.add("Silla_1.png");
+		boTexturesList.add("Candelabro_1.png");
 		for (int i = 0 ; i < (Math.random()*(maximumBreakableObjects - minimumBreakableObjects + 1)+minimumBreakableObjects) ; i++)
 		{
-			BreakableObject newObject = new BreakableObject(new Texture(Gdx.files.internal("Proyectil_2.png")), 500,500);
+			BreakableObject newObject = new BreakableObject(new Texture(boTexturesList.get((int)Math.random()*(boTexturesList.size()+1))), 500,0);
 			addEntity(newObject);
 			spawnAtRandomX(newObject, startingHeight);
 			System.out.println("BO Creado");
-		}
+		}*/
+		
+		listOfEntities.add(new BreakableObject(new Texture("Barril_1.png"), 3, 20, startingHeight));
+		listOfEntities.add(new BreakableObject(new Texture("Barril_1.png"), 3, 60, startingHeight));
+		listOfEntities.add(new BreakableObject(new Texture("Barril_2.png"), 1, 600, startingHeight));
+		listOfEntities.add(new BreakableObject(new Texture("Silla_1.png"), 5, 400, startingHeight));
+		listOfEntities.add(new BreakableObject(new Texture("Silla_1.png"), 5, 430, startingHeight));
+		listOfEntities.add(new BreakableObject(new Texture("Candelabro_1.png"), 1, 0, startingHeight));
+		listOfEntities.add(new BreakableObject(new Texture("Candelabro_1.png"), 1, 700, startingHeight));
 		
 		setVoidColor(new Color(0.6f,0.8f,0.8f,1));
 	}

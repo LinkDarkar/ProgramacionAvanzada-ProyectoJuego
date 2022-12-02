@@ -28,7 +28,7 @@ public class BossData
 				//{{dimX1,dimY1},...,{dimXN,dimYN}}
 				int [][][] auxAttackPatternHitbox = {{{40,20},{100,50}},{{40,20},{100,50},{150,100}}};
 				//{SpriteMap,DimensionX,DimensionY,tiempoDuracionPorFrame}
-				Object[][] auxAttackAnimationData = {{"youmu attack 1.png",64,64,4,0.21f},{"youmu attack 1.png",64,64,4,2f}};
+				Object[][] auxAttackAnimationData = {{"reisenAttackKick.png",64,64,4,0.21f},{"reisenAttackKick.png",64,64,4,2f}};
 				this.name = "Miriam";
 				this.idle = new Texture(Gdx.files.internal("MiriamIdleAnim_0.png"));
 				this.hp = 100;
