@@ -25,7 +25,7 @@ public class AttackPattern implements IAttack
 	}
 	
 	@Override
-	public int attack ()
+	public int attack()
 	{		
 		if (timer >= timerDefault)
 		{

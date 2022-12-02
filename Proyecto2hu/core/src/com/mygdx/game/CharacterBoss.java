@@ -74,6 +74,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 							this.getFacingRight(),
 							new MoveByPixel(),this.getPosX()+(this.getHitboxWidth()/2), this.getPosY()+(this.getHitboxHeight()/2))
 						);*/
+					@SuppressWarnings("rawtypes")
 					Projectile proyectilTest = new Projectile<MoveSine>(
 							new Texture(Gdx.files.internal("Proyectil_4.png")),
 							getTeam(),
@@ -81,7 +82,7 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 							100,
 							2,
 							this.getFacingRight(),
-							new MoveSine(2),
+							new MoveSine(5, 3),
 							this.getPosX()+(this.getHitboxWidth()/2),
 							this.getPosY()+(this.getHitboxHeight()/2));
 					ScreenBase.Instance.addEntity(proyectilTest);

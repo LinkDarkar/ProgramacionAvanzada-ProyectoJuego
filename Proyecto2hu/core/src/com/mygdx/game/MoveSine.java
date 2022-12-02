@@ -7,14 +7,16 @@ public class MoveSine implements IMovement
 {
     private double current = 0;
     private float verticalSpeed = 1;
+    private float frecuency = .5f;
     
-    public MoveSine(float verticalSpeed)
+    public MoveSine(float verticalSpeed, float frecuency)
     {
         this.verticalSpeed = verticalSpeed;
+        this.frecuency = frecuency;
     }
     public MoveSine()
     {
-        
+    	
     }
 
     @Override
@@ -40,6 +42,6 @@ public class MoveSine implements IMovement
 
     private void IncreaseCurrent()
     {
-        current = current < Math.toRadians(360) ? current +  Math.toRadians(90) * Gdx.graphics.getDeltaTime() : 0;
+        current = current < Math.toRadians(360) ? current +  Math.toRadians(frecuency*180) * Gdx.graphics.getDeltaTime() : 0;
     }
 }
