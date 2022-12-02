@@ -70,12 +70,12 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 	}
 
 //Creación de elementos del jugador
-	public Rectangle createHitbox() {
+	public Rectangle createHitbox(float x, float y) {
 		Rectangle hitbox = new Rectangle();
 		hitbox.height = 64;
 		hitbox.width = 64;
-		hitbox.x = 0;
-		hitbox.y = 0;
+		hitbox.x = x;
+		hitbox.y = y;
 
 		return hitbox;
 	}
@@ -102,7 +102,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 
 	public void createTestAttackAnimation() {
 		auxTexture = new Texture("plAttack.png");
-		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, 92, 64);
+		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, auxTexture.getWidth()/4, auxTexture.getHeight());
 
 		auxAnimationFrames = new TextureRegion[4];
 		for (int index = 0; index < 4; index += 1) {
@@ -114,7 +114,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 
 	public void createDeflectAnimation() {
 		auxTexture = new Texture("pl_deflect01.png");
-		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, 64, 64);
+		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, auxTexture.getWidth(), auxTexture.getHeight());
 
 		auxAnimationFrames = new TextureRegion[1];
 		for (int index = 0; index < 1; index += 1) {
@@ -144,10 +144,7 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 			stateTime = 0f;
 		case walking: {
 			if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) ^ Gdx.input.isKeyPressed(Input.Keys.RIGHT))) {
-				if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-					setFacingDirection(false);
-				else
-					setFacingDirection(true);
+				setFacingDirection(Gdx.input.isKeyPressed(Input.Keys.RIGHT) ? true : false);
 				setCharacterState(CharacterState.walking);
 			} else {
 				setCharacterState(CharacterState.idle);
@@ -184,10 +181,10 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 			dashInCooldown = dashCooldownCheck();
 		}
 
-		if (getHitbox().x < 0)
-			getHitbox().x = 0;
-		if (getHitbox().x > 800 - 64)
-			getHitbox().x = 800 - 64;
+		if (getHitboxPosition_X() < 0)
+			setHitboxPosition_X(0);
+		if (getHitboxPosition_X() > 800 - getHitboxWidth())
+			setHitboxPosition_X(800 - getHitboxWidth());
 	}
 
 //Control de animaciones y estados
@@ -252,14 +249,14 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 		 */
 		stateTime += Gdx.graphics.getDeltaTime() * ((float) getXvel() / 100);
 		batch.draw(walkingAnimation.getKeyFrame(stateTime, true), getFacingRight() ? getPosX() : getPosX() + 64,
-				getPosY(), getFacingRight() ? 64 : -64, 64);
+				getPosY(), getFacingRight() ? walkingAnimation.getKeyFrame(stateTime, true).getRegionWidth() : -walkingAnimation.getKeyFrame(stateTime, true).getRegionWidth(), walkingAnimation.getKeyFrame(stateTime, true).getRegionHeight());
 	}
 
 	public void renderAnimation(Animation<TextureRegion> animation, SpriteBatch batch)
 	{
 		stateTime += Gdx.graphics.getDeltaTime();
 		batch.draw(animation.getKeyFrame(stateTime, true), getFacingRight() ? getPosX() : getPosX() + 64, getPosY(),
-				getFacingRight() ? 64 : -64, 64);
+				getFacingRight() ? animation.getKeyFrame(stateTime, true).getRegionWidth() : -animation.getKeyFrame(stateTime, true).getRegionWidth(), animation.getKeyFrame(stateTime, true).getRegionHeight());
 	}
 
 //Cooldowns

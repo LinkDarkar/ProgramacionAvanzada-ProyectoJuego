@@ -4,15 +4,11 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.mygdx.game.Character.CharacterState;
-import com.mygdx.game.Entity.Team;
 
 public class CharacterBoss<Move extends IMovement> extends Character<Move>
 {	
@@ -22,8 +18,6 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	 * 
 	 *
 	*/
-	private Character<?> characterPlayer;
-
 	private float stateTime = 0f;
 	/* variables que controlan los ataques
 	 * del personaje
@@ -67,6 +61,18 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 					currentAttack = ThreadLocalRandom.current().nextInt(0, this.attacksList.size());
 					break;
 				}
+				if(Gdx.input.isKeyJustPressed(Input.Keys.O))
+				{
+					ScreenBase.Instance.addEntity(new Projectile<MoveByPixel>(
+							new Texture(Gdx.files.internal("Proyectil_4.png")),
+							getTeam(),
+							500,
+							100,
+							2,
+							false,
+							new MoveByPixel())
+						);
+				}
 				
 				/*this.getMove().continueMoving(getHitbox());
 				int randomMove = ThreadLocalRandom.current().nextInt(1, 101);
@@ -96,8 +102,8 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 			attackInCooldown = attackCooldownCheck();
 		}
 		
-		if(getHitbox().x < 0) getHitbox().x = 0;
-		if(getHitbox().x > 800 - 64) getHitbox().x = 800 - 64;
+		if(getHitboxPosition_X() < 0) setHitboxPosition_X(0);
+		if(getHitboxPosition_X() > 800 - 64) setHitboxPosition_X(800 - 64);
 	}
 
 	public void move()

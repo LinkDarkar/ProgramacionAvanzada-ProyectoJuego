@@ -13,6 +13,7 @@ public abstract class Entity
 {
 	private ShapeRenderer shapeRenderer;	//Debug
 	private Rectangle hitbox;
+	private int health;
 	private boolean canGetHit = true;
 	private Texture sprite;
 	private float centerX;
@@ -56,18 +57,61 @@ public abstract class Entity
 	{
 		return this.getHitbox().overlaps(attackingHitbox);
 	}
-	
+	public int getHealth()
+	{
+		return health;
+	}
+	public void setHealth(int health)
+	{
+		this.health = health;
+	}
+	public void takeDamage(int damage)
+	{
+		this.health -= damage;
+	}
+	public void takeDamage(int damage, int minimum)
+	{
+		this.health = Math.max(health - damage, minimum);
+	}
 	public Rectangle getHitbox()
 	{
 		return hitbox;
 	}
 	public float getHitboxWidth()
 	{
+		if (hitbox == null) return 0;
 		return hitbox.width;
 	}
 	public float getHitboxHeight()
 	{
+		if (hitbox == null) return 0;
 		return hitbox.height;
+	}
+	public float getHitboxPosition_X()
+	{
+		if (hitbox == null) return 0;
+		return hitbox.x;
+	}
+	public void setHitboxPosition_X(int newPosition)
+	{
+		hitbox.x = newPosition;
+	}
+	public void setHitboxPosition_X(float newPosition)
+	{
+		hitbox.x = newPosition;
+	}
+	public float getHitboxPosition_Y()
+	{
+		if (hitbox == null) return 0;
+		return hitbox.y;
+	}
+	public void setHitboxPosition_Y(int newPosition)
+	{
+		hitbox.y = newPosition;
+	}
+	public void setHitboxPosition_Y(float newPosition)
+	{
+		hitbox.y = newPosition;
 	}
 	public boolean canGetHit()
 	{
@@ -85,6 +129,10 @@ public abstract class Entity
 	{
 		return team;
 	}
+	public void changeTeam(Team team)
+	{
+		this.team = team;
+	}
 	
 	public void moveTo(float x, float y)
 	{
@@ -92,8 +140,12 @@ public abstract class Entity
 		this.hitbox.y = y;
 	}
 	
-	public abstract Rectangle createHitbox();
-	public abstract boolean renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList);
+	public abstract Rectangle createHitbox(float x, float y);
+	public boolean renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList) {
+		if (getHealth() <= 0) return false;
+		batch.draw(getSprite(), getHitboxPosition_X(), getHitboxPosition_Y());
+		return true;
+	}
 	public abstract void collisionHit(Character<?> character);
 	
 	/**********************DEBUG****************************/

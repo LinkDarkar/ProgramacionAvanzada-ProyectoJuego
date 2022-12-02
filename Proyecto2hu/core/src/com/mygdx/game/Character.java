@@ -19,7 +19,6 @@ public abstract class Character<Move extends IMovement> extends Entity
 	private Sound succesfulDeflectSound;
 	
 	private String nombre;	//no se va a usar
-	private int health;		//vida: si es <= 0 se muere
 	private int posture;	//por si el combate está muy fácil, empezaría en 0
 	private int damage;
 	private int xvel;
@@ -62,7 +61,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		this.hurtSound = hurtSound;
 		this.succesfulDeflectSound = succesfulDeflectSound;
 		this.nombre = name;
-		this.health = health;
+		setHealth(health);
 		this.posture = 0;
 		this.facingRight = true;
 		this.xvel = 130;
@@ -72,13 +71,13 @@ public abstract class Character<Move extends IMovement> extends Entity
 		createAttackHitbox();
 	}
 	
-	public Character(Texture sprite, String name, int hp, boolean canTakeKnockback,
+	public Character(Texture sprite, String name, int health, boolean canTakeKnockback,
 			Move move)
 	{
 		super(sprite);
 		this.swordHitboxTexture = new Texture("penitent_rangeAttack_projectile_anim_4.png");
 		this.nombre = name;
-		this.health = hp;
+		setHealth(health);
 		this.posture = 0;
 		this.facingRight = false;
 		this.xvel = 600;
@@ -88,7 +87,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		createAttackHitbox();
 	}
 	//implementar esto en Character porque puede que no haga nada
-	public abstract void createAttackHitbox ();
+	public abstract void createAttackHitbox();
 	
 	public String getNombre()
 	{
@@ -97,10 +96,6 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public int getPosture()
 	{
 		return this.posture;
-	}
-	public int getHealth()
-	{
-		return this.health;
 	}
 	public int getDamage()
 	{
@@ -232,8 +227,8 @@ public abstract class Character<Move extends IMovement> extends Entity
 	
 	public void takeDamage (int damageReceived)
 	{
-		this.health = Math.max(health - damageReceived, 0);
-		if (health <= 0)
+		takeDamage(damageReceived, 0);
+		if (getHealth() <= 0)
 		{
 			System.out.println("THIS CHARACTER DIED WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!");
 			// Maybe play an animation, sound or something else
@@ -241,8 +236,8 @@ public abstract class Character<Move extends IMovement> extends Entity
 	}
 	public void takeDamage ()
 	{
-		this.health = Math.max(health - 1, 0);
-		if (health <= 0) System.out.println("THIS CHARACTER DIED WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!");
+		takeDamage(1, 0);
+		if (getHealth() <= 0) System.out.println("THIS CHARACTER DIED WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO!");
 		// Should end the game
 	}
 	/**********************MOVIMIENTO****************************/
@@ -268,7 +263,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 	
 	public boolean renderFrame (SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
-		if (health <= 0) return false;
+		if (getHealth() <= 0 || entitiesList == null || entitiesList.size() < 1) return false;
 		changeAttackHitboxPosition(this.attackHitbox);
 		
 		for (int index = 0 ; index < entitiesList.size() ; index++)
@@ -289,7 +284,7 @@ public abstract class Character<Move extends IMovement> extends Entity
 		switch (characterState)
 		{
 			case idle:
-				batch.draw(getSprite(), getHitbox().x, getHitbox().y);
+				batch.draw(getSprite(), getHitboxPosition_X(), getHitboxPosition_Y());
 				break;
 			case walking:
 				//System.out.println("jugador x = "+ getHitbox().x);
@@ -338,5 +333,9 @@ public abstract class Character<Move extends IMovement> extends Entity
 	    this.getShapeRenderer().begin();
 	    this.getShapeRenderer().rect(attackHitbox.getX(), attackHitbox.getY(), attackHitbox.getWidth(), attackHitbox.getHeight());
 	    this.getShapeRenderer().end();
+	}
+	@Override
+	public void dispose()
+	{
 	}
 }

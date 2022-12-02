@@ -1,0 +1,127 @@
+package com.mygdx.game;
+
+import java.util.ArrayList;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.game.Entity.Team;
+
+public class Screen_Fight_1 extends ScreenBase {
+	private CharacterPlayer<MoveByPixel> player;
+	private CharacterBoss<MoveVectorial> enemy;
+	@SuppressWarnings("rawtypes")
+	private ArrayList<Projectile> projectilesList;
+	private int startingHeight = 60;
+	private float timeCounter = 0;
+	private float returningCount = 3;
+
+	ArrayList<Entity> listOfEntities;
+
+	// Se ejecuta siempre que se llege a esta pantalla
+	@SuppressWarnings("rawtypes")
+	public Screen_Fight_1(Proyecto2hu game)
+	{
+		super(game);
+		int startingOffset = 200;
+		Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
+		Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
+		Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
+
+		listOfEntities = new ArrayList<Entity>();
+
+		// Creates a Player Entity
+		player = new CharacterPlayer<MoveByPixel>(
+				new Texture(Gdx.files.internal("ch14.png")), // Textura
+				new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")), // Textura
+				hurtSound, deflectingSound, succesfulDeflectSound, // Sonidos (deberían ser un arreglo mejor
+				"Youmu", // Nombre
+				100, // HP
+				Team.Player, // Equipo
+				true, // Puede recibir knockback?
+				new MoveByPixel()); // Tipo de movimiento
+
+		spawnAt(player, startingOffset, startingHeight, false);
+		
+		listOfEntities.add(player);
+
+		enemy = new CharacterBoss<MoveVectorial>(new BossData(0)); 
+
+		spawnAt(enemy, startingOffset, startingHeight, true);
+		
+		listOfEntities.add(enemy);
+		
+		// Creates the new Projectiles List
+		projectilesList = new ArrayList<Projectile>();
+		
+		setVoidColor(new Color(0.6f,0.7f,0.5f,1));
+	}
+
+	@Override
+	public void RenderFrame()
+	{
+		getBatch().draw(new Texture(Gdx.files.internal("floor.png")), 0, 0);
+		if (!player.renderFrame(getBatch(), listOfEntities)) listOfEntities.remove(player);
+		if (!enemy.renderFrame(getBatch(), listOfEntities)) listOfEntities.remove(enemy);
+
+		for (int i = 0 ; i < projectilesList.size() ; i++)
+		{
+			Projectile<?> currentProjectile = projectilesList.get(i);
+			if(!currentProjectile.renderFrame(getBatch(), null))
+			{
+				System.out.println("Removiendo Projectil");
+				projectilesList.remove(currentProjectile);
+				listOfEntities.remove(currentProjectile);
+				currentProjectile.dispose();
+				i--;
+				continue;
+			}
+		}
+	}
+	
+	@Override
+	public void ManageFont()
+	{
+		setTextScale(2,2);
+
+		String text_Player_HP = "Vida Jugador ["+player.getHealth()+"]";
+		drawText(text_Player_HP, 50, 475);
+
+		String text_Enemy_HP = "["+enemy.getHealth()+"] Vida Enemigo";
+		drawText(text_Enemy_HP, getPositionFromRightForText(text_Enemy_HP, 50), 475);
+
+		String exitingString =  "Saliendo en "+ Math.floor(returningCount * 10) / 10+"...";
+		if (returningCount < 3) drawText(exitingString, getHorizontalCenterForText(exitingString), getVerticalCenterForText(exitingString));
+
+		timeCounter += Gdx.graphics.getDeltaTime();
+		String str = Integer.toString((int)timeCounter%600000000);
+
+		setTextScale(3,3);
+
+		drawText(str, getHorizontalCenterForText(str), 450);
+	}
+
+	@Override
+	public void CheckInputs()
+	{
+		SpriteBatch batch = getBatch();
+		player.controlCharacterPlayer(batch);
+		enemy.AIBehaveour(batch);
+		
+		// Si se mantiene por X segundos se vuelve al menú
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
+		{
+			returningCount -= Gdx.graphics.getDeltaTime();
+			System.out.println("Saliendo... "+(int)returningCount);
+			if (returningCount <= 0)
+			{
+				game.setScreen(new Screen_Menu(game));
+				dispose();
+			}
+		}
+		else returningCount = 3;
+	}
+}

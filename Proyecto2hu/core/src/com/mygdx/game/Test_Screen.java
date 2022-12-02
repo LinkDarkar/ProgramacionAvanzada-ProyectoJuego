@@ -1,43 +1,34 @@
 package com.mygdx.game;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.game.Entity.Team;
 
 public class Test_Screen extends ScreenBase {
 	private CharacterPlayer<MoveByPixel> player;
 	//private CharacterPlayer<MoveCircle> player2;
 	private CharacterBoss<MoveVectorial> enemy;
-	@SuppressWarnings("rawtypes")
-	private ArrayList<Projectile> projectilesList;
-	private int startingPos = 60;
+	private int startingHeight = 60;
 	private float timeCounter = 0;
-
-	ArrayList<Entity> listOfEntities;
+	private float returningCount = 3;
+	private int minimumBreakableObjects = 3;
+	private int maximumBreakableObjects = 7;
 
 	// Se ejecuta siempre que se llege a esta pantalla
-	@SuppressWarnings("rawtypes")
 	public Test_Screen(Proyecto2hu game)
 	{
 		super(game);
+		ScreenBase.Instance = this;
 		int startingOffset = 200;
 		Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
 		Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
 		Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
-
-		listOfEntities = new ArrayList<Entity>();
 
 		// Creates a Player Entity
 		player = new CharacterPlayer<MoveByPixel>(
@@ -50,9 +41,9 @@ public class Test_Screen extends ScreenBase {
 				true, // Puede recibir knockback?
 				new MoveByPixel()); // Tipo de movimiento
 
-		spawnAt(player, startingOffset, false);
+		spawnAt(player, startingOffset, startingHeight, false);
 		
-		listOfEntities.add(player);
+		addEntity(player);
 
 		//player2 = new CharacterPlayer<MoveCircle>(new Texture(Gdx.files.internal("ch14.png")),
 				 //new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")),
@@ -62,25 +53,25 @@ public class Test_Screen extends ScreenBase {
 
 		enemy = new CharacterBoss<MoveVectorial>(new BossData(0)); 
 
-		spawnAt(enemy, startingOffset, true);
+		spawnAt(enemy, startingOffset, startingHeight, true);
 		
-		listOfEntities.add(enemy);
+		addEntity(enemy);
 		
 		// Creates the new Projectiles List
-		projectilesList = new ArrayList<Projectile>();
+		//projectilesList = new ArrayList<Projectile>();
 		
 		
 		// Creates 2 individual new projectiles to test
-		projectilesList.add(new Projectile<MoveByPixel>(
+		addEntity(new Projectile<MoveByPixel>(
 				new Texture(Gdx.files.internal("Proyectil_4.png")),
 				Team.IA,
-				10,
+				500,
 				100,
 				2,
 				false,
 				new MoveByPixel()));
 		System.out.println("Proyectile Created");
-		projectilesList.add(new Projectile<MoveSine>(
+		addEntity(new Projectile<MoveSine>(
 				new Texture(Gdx.files.internal("Proyectil_1.png")),
 				Team.IA,
 				0,
@@ -91,19 +82,25 @@ public class Test_Screen extends ScreenBase {
 		System.out.println("Proyectile Created");
 		
 		// Creating the Tree of Doom
-		projectilesList.add(new Projectile<MoveByPixel>(
+		addEntity(new Projectile<MoveByPixel>(
 				new Texture(Gdx.files.internal("ProjectileTest.png")),
-				Team.IA,
+				Team.Neutral,
 				10,
 				10f,
-				2,
+				0,
 				false,
 				new MoveByPixel()));
 		System.out.println("Proyectile Created");
 		
-		for (int i = 0 ; i < projectilesList.size() ; i++)
+		/*for (int i = 0 ; i < projectilesList.size() ; i++)
 		{
 			listOfEntities.add(projectilesList.get(i));
+		}*/
+		for (int i = 0 ; i < (Math.random()*(maximumBreakableObjects - minimumBreakableObjects + 1)+minimumBreakableObjects) ; i++)
+		{
+			BreakableObject newObject = new BreakableObject(new Texture(Gdx.files.internal("Proyectil_2.png")));
+			addEntity(newObject);
+			spawnAtRandomX(newObject, startingHeight);
 		}
 		
 		setVoidColor(new Color(0.6f,0.8f,0.8f,1));
@@ -112,48 +109,19 @@ public class Test_Screen extends ScreenBase {
 	@Override
 	public void RenderFrame()
 	{
-		//if (player.getHealth() > 0) player.renderFrame(getBatch(), enemy);
-		//if (enemy.getHealth() > 0) enemy.renderFrame(getBatch(), player);
-		
-		if (!player.renderFrame(getBatch(), listOfEntities))
+		getBatch().draw(new Texture(Gdx.files.internal("floor.png")), 0, 0);
+		for (int i = 0 ; i < listOfEntities.size() ; i++)
 		{
-			listOfEntities.remove(player);
-			//dispose();
-		}
-		if (!enemy.renderFrame(getBatch(), listOfEntities))
-		{
-			listOfEntities.remove(enemy);
-			//dispose();
-		}
-
-		for (int i = 0 ; i < projectilesList.size() ; i++)
-		{
-			Projectile<?> currentProjectile = projectilesList.get(i);
-			/*
-			if(currentPro.checkCollision(player))
+			Entity currentEntity = listOfEntities.get(i);
+			if(!currentEntity.renderFrame(getBatch(), listOfEntities))
 			{
-				projectilesList.remove(i);
-				continue;
-			}
-			if(currentPro.checkCollision(enemy))
-			{
-				projectilesList.remove(i);
-				continue;
-			}*/
-			if(!currentProjectile.renderFrame(getBatch(), null))
-			{
-				System.out.println("Removiendo Projectil");
-				projectilesList.remove(currentProjectile);
-				listOfEntities.remove(currentProjectile);
-				currentProjectile.dispose();
-				//dispose(currentProjectile);
+				if (!listOfEntities.remove(currentEntity)) System.out.println("Couldn't remove Entity from List");
+				else System.out.println("Removed Successfully");
+				currentEntity.dispose();
 				i--;
 				continue;
 			}
-			//System.out.println("Proyectile Drawn");
 		}
-		//player2.renderFrame(getBatch());
-		getBatch().draw(new Texture(Gdx.files.internal("floor.png")), 0, 0);
 	}
 	
 	@Override
@@ -174,6 +142,10 @@ public class Test_Screen extends ScreenBase {
 			drawText("Facing: " + (enemy.getFacingRight() ? "Derecha" : "Izquierda"), 650, 425);
 			drawText("Can Get Hit: " + (enemy.canGetHit() ? "True" : "False"), 650, 400);
 		}
+		
+		String exitingString =  "Saliendo en "+ Math.floor(returningCount * 10) / 10+"...";
+		if (returningCount < 3) drawText(exitingString, getHorizontalCenterForText(exitingString), getVerticalCenterForText(exitingString));
+		
 		timeCounter += Gdx.graphics.getDeltaTime();
 		String str = Integer.toString((int)timeCounter%600000000);
 		setTextScale(2,2);
@@ -187,28 +159,29 @@ public class Test_Screen extends ScreenBase {
 		player.controlCharacterPlayer(batch);
 		enemy.AIBehaveour(batch);
 		//player2.controlCharacterPlayer(getBatch());
+		
+		// Si se mantiene por X segundos se vuelve al menú
+		if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
+		{
+			returningCount -= Gdx.graphics.getDeltaTime();
+			System.out.println("Saliendo... "+(int)returningCount);
+			if (returningCount <= 0)
+			{
+				game.setScreen(new Screen_Menu(game));
+				dispose();
+			}
+		}
+		else returningCount = 3;
 	}
-	
-	private void spawnAt(Entity entity, int offSet, boolean rightSideFromCenter)
-	{
-		if (rightSideFromCenter) entity.moveTo((getCameraWidth()/2) + offSet, startingPos);
-		else entity.moveTo((getCameraWidth()/2) - offSet, startingPos);
-	}
-	@SuppressWarnings("unused")
-	private void spawnAt(Entity entity, int x)
-	{
-		entity.moveTo(x, startingPos);
-	}
-	@SuppressWarnings("unused")
-	private void spawnAt(Entity entity, int x, int y)
-	{
-		entity.moveTo(x, y);
-	}
-	
 	@Override
 	public void dispose() {
 		// Recorre lista de eliminados
 		// dispose(elemento);
 
+	}
+	
+	public void createProjectile()
+	{
+		// Crea el projectil y lo agrega a la lista
 	}
 }

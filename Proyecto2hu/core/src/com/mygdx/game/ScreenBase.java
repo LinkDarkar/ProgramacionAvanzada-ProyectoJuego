@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -10,12 +12,28 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class ScreenBase implements Screen {
+	public static ScreenBase Instance;
 	final Proyecto2hu game;
 	private SpriteBatch batch;
 	private BitmapFont font;
 	private OrthographicCamera camera;
 	ExtendViewport viewport;
 	private Color voidColor;
+	
+	protected ArrayList<Entity> listOfEntities;
+
+	// Se ejecuta siempre que se llege a esta pantalla
+	public ScreenBase(Proyecto2hu game) {
+		Instance = this;
+		this.game = game;
+		this.batch = game.getBatch();
+		this.font = game.getFont();
+		this.voidColor = new Color(0.2f,0.2f,0.2f,1);
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, 800, 480);
+		viewport = new ExtendViewport(800,480,camera);
+		listOfEntities = new ArrayList<Entity>();
+	}
 
 	public SpriteBatch getBatch() {
 		return batch;
@@ -52,16 +70,6 @@ public class ScreenBase implements Screen {
 		return this.voidColor;
 	}
 
-	// Se ejecuta siempre que se llege a esta pantalla
-	public ScreenBase(Proyecto2hu game) {
-		this.game = game;
-        this.batch = game.getBatch();
-        this.font = game.getFont();
-        this.voidColor = new Color(0.2f,0.2f,0.2f,1);
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
-		viewport = new ExtendViewport(800,480,camera);
-	}
 
 	@Override
 	public void show() {
@@ -166,5 +174,44 @@ public class ScreenBase implements Screen {
 	{
 		GlyphLayout layout = new GlyphLayout(font, str);
 		return (getCameraHeight()/2) - (layout.height/2);
-	}	
+	}
+	public float getPositionFromRightForText(String str)
+	{
+		GlyphLayout layout = new GlyphLayout(font, str);
+		return (getCameraWidth() - layout.width);
+	}
+	public float getPositionFromTopForText(String str)
+	{
+		GlyphLayout layout = new GlyphLayout(font, str);
+		return (getCameraHeight() - layout.height);
+	}
+	public float getPositionFromRightForText(String str, float offset)
+	{
+		GlyphLayout layout = new GlyphLayout(font, str);
+		return (getCameraWidth() - layout.width - offset);
+	}
+	public float getPositionFromTopForText(String str, float offset)
+	{
+		GlyphLayout layout = new GlyphLayout(font, str);
+		return (getCameraHeight() - layout.height - offset);
+	}
+	
+	// Spawns at an OffSet from the center to the Left (false) or the Right (true)
+	protected void spawnAt(Entity entity, int offSet, int height, boolean rightSideFromCenter)
+	{
+		if (rightSideFromCenter) entity.moveTo((getCameraWidth()/2) + offSet, height);
+		else entity.moveTo((getCameraWidth()/2) - offSet, height);
+	}
+	protected void spawnAt(Entity entity, int x, int y)
+	{
+		entity.moveTo(x, y);
+	}
+	protected void spawnAtRandomX(Entity entity, int y)
+	{
+		spawnAt(entity, (int)(Math.random()*(getCameraWidth() - entity.getHitboxWidth())), y);
+	}
+	public void addEntity(Entity entity)
+	{
+		listOfEntities.add(entity);
+	}
 }

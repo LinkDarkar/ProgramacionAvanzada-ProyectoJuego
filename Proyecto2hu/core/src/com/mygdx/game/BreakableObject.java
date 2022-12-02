@@ -1,44 +1,39 @@
 package com.mygdx.game;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class BreakableObject extends Entity
 {
-	public BreakableObject(Texture sprite) {
-		super(sprite);
-	}
-
-	private boolean state;	//??????????????
-	
-	public void getHit()
+	public BreakableObject(Texture sprite)
 	{
-		state = false;		//??????????????
+		super(sprite);
 	}
 
 	@Override
 	public Rectangle createHitbox() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void renderFrame(SpriteBatch batch, Character<?> character) {
-		// TODO Auto-generated method stub
+		Rectangle hitbox = new Rectangle();
+		hitbox.height = 50;
+		hitbox.width = 50;
 		
+		return hitbox;
 	}
 
 	@Override
 	public void collisionHit(Character<?> character) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList) {
-		// TODO Auto-generated method stub
-		
+		if (character == null || character.getTeam() == getTeam()) return;
+		switch(character.getCharacterState())
+		{
+			case attacking:
+				if (character.attackHitboxOverlaps(this.getHitbox()) && // The Attack Hitbox is collisioning
+					character.getChargingAttack() == false && // The hitbox is active
+					this.canGetHit() == true) // The unit can get hit)
+				{
+					takeDamage(1, 0);
+				}
+				break;
+			default:
+				break;
+		}
 	}
 }

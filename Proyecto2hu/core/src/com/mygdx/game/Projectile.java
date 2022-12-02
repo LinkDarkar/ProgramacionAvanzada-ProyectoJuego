@@ -6,14 +6,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.mygdx.game.Character.CharacterState;
 
 public class Projectile<Move extends IMovement> extends Entity
 {
 	private Move move; // Como se mueve
 	private float speed = 100; // Velocidad/Aceleración
 	private float aliveTime = 1000; // Tiempo que durará vivo en milisegundos
-	private int health = 1;
 	private int damage = 1; // Daño que realizará
 	private boolean movingRight; // Dirección de movimiento (false = Izquierda, true = Derecha)
 	//private int pierceAmount = 0; // Cantidad de entidades que puede atravezar. 0 Significa que se destruye con el primer impacto
@@ -25,6 +23,7 @@ public class Projectile<Move extends IMovement> extends Entity
 		this.damage = damage;
 		this.movingRight = movingRight;
 		this.move = move;
+		setHealth(1);
 	}
 	
 	public float getSpeed() {
@@ -67,13 +66,13 @@ public class Projectile<Move extends IMovement> extends Entity
 	//@Override
 	public boolean renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
-		if (aliveTime <= 0 || health <= 0)
+		if (aliveTime <= 0 || getHealth() <= 0)
 		{
 			System.out.println("Projectil debería desaparecer");
 			return false;
 		}
 		
-		System.out.println("Projectile HP = "+health);
+		//System.out.println("Projectile HP = "+getHealth());
 
 		if(movingRight) move.moveRight(getHitbox(), speed);
 		else move.moveLeft(getHitbox(), speed);
@@ -86,22 +85,42 @@ public class Projectile<Move extends IMovement> extends Entity
 	@Override
 	public void collisionHit(Character<?> character)
 	{
-		if (character == null) return;
+		if (character == null || character.getTeam() == getTeam() || getTeam() == Team.Neutral) return;
 		// Verifica si la espada está golpeando
-		if (character.getCharacterState() == CharacterState.attacking && // Foe is attacking
-			character.attackHitboxOverlaps(this.getHitbox()) && // The Attack Hitbox is collisioning
-			character.getChargingAttack() == false && // The hitbox is active
-			this.canGetHit() == true) // The unit can get hit
+		switch(character.getCharacterState())
 		{
-			System.out.println("Proyectile Collisioned with the Sword!");
-			this.health = 0;
+			case attacking:
+				if (character.attackHitboxOverlaps(this.getHitbox()) && // The Attack Hitbox is collisioning
+					character.getChargingAttack() == false && // The hitbox is active
+					this.canGetHit() == true) // The unit can get hit)
+				{
+					System.out.println("Proyectile Collisioned with the Sword!");
+					setHealth(0);
+				}
+				break;
+			case deflecting:
+				if (character.hitboxOverlaps(this.getHitbox()))
+				{					
+					changeTeam(character.getTeam());
+					swapMovingDirection();
+				}
+				break;
+			case dashing:
+				break;
+			default:
+				if (character.hitboxOverlaps(this.getHitbox()))
+				{					
+					System.out.println("Projectile Hit Character!");
+					setHealth(0);
+					character.takeDamage(damage);
+					// pierceAmount--;
+				}
+				break;
 		}
-		else if (character.getCharacterState() != CharacterState.dashing && character.getHitbox().overlaps(this.getHitbox()))
-		{
-			System.out.println("Projectile Hit Character!");
-			this.health = 0;
-			character.takeDamage(damage);
-		}
-		//pierceAmount--;
+	}
+	public void swapMovingDirection()
+	{
+		System.out.println("New Direction = "+ (movingRight ? "Right" : "Left"));
+		movingRight = movingRight ? false : true;
 	}
 }
