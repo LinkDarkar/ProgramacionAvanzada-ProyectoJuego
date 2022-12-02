@@ -16,8 +16,10 @@ public class Projectile<Move extends IMovement> extends Entity
 	private boolean movingRight; // Dirección de movimiento (false = Izquierda, true = Derecha)
 	//private int pierceAmount = 0; // Cantidad de entidades que puede atravezar. 0 Significa que se destruye con el primer impacto
 	
-	public Projectile(Texture sprite, Team team, float speed, float time, int damage, boolean movingRight, Move move) {
-		super(sprite, team);
+	public Projectile(Texture sprite, Team team, float speed, float time,
+			int damage, boolean movingRight, Move move, float initialPosX, float initialPosY)
+	{
+		super(sprite, team, initialPosX, initialPosY);
 		this.speed = speed;
 		this.aliveTime = time;
 		this.damage = damage;
@@ -52,13 +54,13 @@ public class Projectile<Move extends IMovement> extends Entity
 	}
 
 	@Override
-	public Rectangle createHitbox ()
+	public Rectangle createHitbox (float x, float y)
 	{
 		Rectangle hitbox = new Rectangle();
 		hitbox.height = 32;
 		hitbox.width = 32;
-		hitbox.x = 400;
-		hitbox.y = 100;
+		hitbox.x = x;
+		hitbox.y = y;
 		
 		return hitbox;
 	}
@@ -103,6 +105,7 @@ public class Projectile<Move extends IMovement> extends Entity
 				{					
 					changeTeam(character.getTeam());
 					swapMovingDirection();
+					character.getSuccesfulDeflectSound().play(0.1f);
 				}
 				break;
 			case dashing:
@@ -114,6 +117,7 @@ public class Projectile<Move extends IMovement> extends Entity
 					setHealth(0);
 					character.takeDamage(damage);
 					// pierceAmount--;
+					character.getHurtSound().play(0.2f);
 				}
 				break;
 		}

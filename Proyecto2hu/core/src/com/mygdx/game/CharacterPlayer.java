@@ -12,20 +12,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
-public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
-	/*
-	 * variables que formarán partes de la importación y el control de las
-	 * animaciones
-	 */
-	private Texture auxTexture; // donde se guarda el spritemap
-	TextureRegion[] auxAnimationFrames; // donde se guardan los frames
+public class CharacterPlayer<Move extends IMovement> extends Character<Move>
+{
 	private float stateTime = 0f; // indicará al renderAnimation el frame que tiene que mostrar
 
 	/*
 	 * variables que controlan los ataques del jugador
 	 */
 	private Animation<TextureRegion> attackAnimation; // donde se guarda la animación
-	private final float ATTACK_FRAME_DURATION = 0.11f; // duración de los frames de la animación
 	private int attackCooldownTimer;
 	private int attackCooldownTimerDefault = 19; // tarda 24 frames en poder volver a atacar
 	private int attackMovementTimer;
@@ -37,7 +31,6 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 	 */
 	private Sound deflectingSound;
 	private Animation<TextureRegion> deflectAnimation;
-	private final float DEFLECT_FRAME_DURATION = 1f; // duración de los frames de la animación
 	private int deflectTime = 0;
 	private int deflectTimeDefault = 13;
 	private int deflectCooldownTimer = 0;
@@ -57,20 +50,22 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 	 * variables que controlan el andar
 	 */
 	private Animation<TextureRegion> walkingAnimation;
-	private final float WALKING_FRAME_DURATION = 0.065f; // duración de los frames de la animación
 
 //Constructores
-	public CharacterPlayer(Texture spriteTable, Texture sprite, Sound sound, Sound sound2, Sound sound3, String name,
-			int hp, Team team, boolean canTakeKnockback, Move move) {
-		super(spriteTable, sprite, sound, sound3, name, hp, team, canTakeKnockback, move);
-		this.deflectingSound = sound2;
-		createTestAttackAnimation();// prueba animacion de ataque
-		createDeflectAnimation();
-		createWalkingAnimation();
+	public CharacterPlayer(CharacterBuilder characterBuilder, Move move, float initialPosX, float initialPosY)
+	{
+		super(characterBuilder.getSprite(), characterBuilder.getHurtSound(), characterBuilder.getSuccesfulDeflectSount(), 
+				characterBuilder.getName(), characterBuilder.getHealth(), characterBuilder.getTeam(),
+				characterBuilder.getCanTakeKnockback(), move, initialPosX, initialPosY);
+		this.deflectingSound = characterBuilder.getDeflectingSound();
+		this.attackAnimation = characterBuilder.getAttackAnimation();
+		this.deflectAnimation = characterBuilder.getDeflectAnimation();
+		this.walkingAnimation = characterBuilder.getWalkingAnimation();
 	}
 
 //Creación de elementos del jugador
-	public Rectangle createHitbox(float x, float y) {
+	public Rectangle createHitbox(float x, float y)
+	{
 		Rectangle hitbox = new Rectangle();
 		hitbox.height = 64;
 		hitbox.width = 64;
@@ -80,7 +75,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 		return hitbox;
 	}
 
-	public void createAttackHitbox() {
+	public void createAttackHitbox()
+	{
 		Rectangle attackHitbox = new Rectangle();
 		attackHitbox.height = 64;
 		attackHitbox.width = 64;
@@ -90,7 +86,8 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 		setAttackHitbox(attackHitbox);
 	}
 
-	public void createAttackHitboxDebug() {
+	public void createAttackHitboxDebug()
+	{
 		Rectangle attackHitbox = new Rectangle();
 		attackHitbox.height = 64;
 		attackHitbox.width = 64;
@@ -98,67 +95,41 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 		attackHitbox.y = getPosY() + 10;
 
 		setAttackHitbox(attackHitbox);
-	}
-
-	public void createTestAttackAnimation() {
-		auxTexture = new Texture("plAttack.png");
-		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, auxTexture.getWidth()/4, auxTexture.getHeight());
-
-		auxAnimationFrames = new TextureRegion[4];
-		for (int index = 0; index < 4; index += 1) {
-			auxAnimationFrames[index] = tmpFrames[0][index];
-		}
-
-		attackAnimation = new Animation<TextureRegion>(ATTACK_FRAME_DURATION, auxAnimationFrames);
-	}
-
-	public void createDeflectAnimation() {
-		auxTexture = new Texture("pl_deflect01.png");
-		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, auxTexture.getWidth(), auxTexture.getHeight());
-
-		auxAnimationFrames = new TextureRegion[1];
-		for (int index = 0; index < 1; index += 1) {
-			auxAnimationFrames[index] = tmpFrames[0][index];
-		}
-
-		deflectAnimation = new Animation<TextureRegion>(DEFLECT_FRAME_DURATION, auxAnimationFrames);
-	}
-
-	public void createWalkingAnimation() {
-		auxTexture = new Texture("plWalking00.png");
-		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, 64, 64);
-
-		auxAnimationFrames = new TextureRegion[14];
-		for (int index = 0; index < 14; index += 1) {
-			auxAnimationFrames[index] = tmpFrames[0][index];
-		}
-
-		walkingAnimation = new Animation<TextureRegion>(WALKING_FRAME_DURATION, auxAnimationFrames);
-		walkingAnimation.setPlayMode(PlayMode.LOOP);
 	}
 
 //Control del jugador
-	public void controlCharacterPlayer(SpriteBatch batch) {
-		switch (getCharacterState()) {
+	public void controlCharacterPlayer(SpriteBatch batch)
+	{
+		switch (getCharacterState())
+		{
 		case idle:
 			stateTime = 0f;
-		case walking: {
-			if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) ^ Gdx.input.isKeyPressed(Input.Keys.RIGHT))) {
+		case walking:
+		{
+			if ((Gdx.input.isKeyPressed(Input.Keys.LEFT) ^ Gdx.input.isKeyPressed(Input.Keys.RIGHT)))
+			{
 				setFacingDirection(Gdx.input.isKeyPressed(Input.Keys.RIGHT) ? true : false);
 				setCharacterState(CharacterState.walking);
-			} else {
+			}
+			else
+			{
 				setCharacterState(CharacterState.idle);
 			}
-			if (Gdx.input.isKeyJustPressed(Input.Keys.Z) && attackInCooldown == false) {
+			if (Gdx.input.isKeyJustPressed(Input.Keys.Z) && attackInCooldown == false)
+			{
 				stateTime = 0f;
 				attackInCooldown = true;
 				setCharacterState(CharacterState.attacking);
-			} else if (Gdx.input.isKeyJustPressed(Input.Keys.X) && deflectInCooldown == false) {
+			}
+			else if (Gdx.input.isKeyJustPressed(Input.Keys.X) && deflectInCooldown == false)
+			{
 				deflectingSound.play(0.1f);
 				stateTime = 0f;
 				attackInCooldown = true;
 				setCharacterState(CharacterState.deflecting);
-			} else if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT) && dashInCooldown == false) {
+			}
+			else if (Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT) && dashInCooldown == false)
+			{
 				dashInCooldown = true;
 				setInKnockback(false);
 				setCharacterState(CharacterState.dashing);
@@ -171,13 +142,16 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 
 		// podríamos dejar estos tres checks en una sola función cooldowns que haga lo
 		// mismo
-		if (attackInCooldown == true) {
+		if (attackInCooldown == true)
+		{
 			attackInCooldown = attackCooldownCheck();
 		}
-		if (deflectInCooldown == true) {
+		if (deflectInCooldown == true)
+		{
 			deflectInCooldown = deflectCooldownCheck();
 		}
-		if (dashInCooldown == true) {
+		if (dashInCooldown == true)
+		{
 			dashInCooldown = dashCooldownCheck();
 		}
 
@@ -188,15 +162,20 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 	}
 
 //Control de animaciones y estados
-	public void attack(SpriteBatch batch, ArrayList<Entity> entitiesList) {
-		if (attackMovementTimer < attackMovementTimerDefault) {
+	public void attack(SpriteBatch batch, ArrayList<Entity> entitiesList)
+	{
+		if (attackMovementTimer < attackMovementTimerDefault)
+		{
 			attackMovementTimer += 1;
 			setChargingAttack(false);
 			this.renderAnimation(attackAnimation, batch);
-		} else {
+		}
+		else
+		{
 			// este for se encarga de que al terminar el ataque las entidades puedan
 			// volver a golpearse
-			for (int index = 0; index < entitiesList.size(); index++) {
+			for (int index = 0; index < entitiesList.size(); index++)
+			{
 				Entity entity = entitiesList.get(index);
 				if (entity == this)
 					continue;
@@ -208,36 +187,51 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 		}
 	}
 
-	public void deflect(SpriteBatch batch) {
-		if (deflectTime < deflectTimeDefault) {
-			if (getFacingRight()) {
+	public void deflect(SpriteBatch batch)
+	{
+		if (deflectTime < deflectTimeDefault)
+		{
+			if (getFacingRight())
+			{
 
-			} else {
+			}
+			else
+			{
 			}
 			deflectTime += 1;
 			this.renderAnimation(deflectAnimation, batch);
-		} else {
+		}
+		else
+		{
 			setCharacterState(CharacterState.idle);
 			deflectTime = 0;
 		}
 	}
 
-	public void dashing(SpriteBatch batch) {
-		if (dashTime < dashTimeDefault) {
+	public void dashing(SpriteBatch batch)
+	{
+		if (dashTime < dashTimeDefault)
+		{
 			dash();
 			dashTime += Gdx.graphics.getDeltaTime();
 			batch.draw(getSprite(), getFacingRight() ? getPosX() : getPosX() + 64, getPosY(),
 					getFacingRight() ? 64 : -64, 64);
-		} else {
+		}
+		else
+		{
 			setCharacterState(CharacterState.idle);
 			dashTime = 0;
 		}
 	}
 
-	public void walking(SpriteBatch batch) {
-		if (getFacingRight() == true) {
+	public void walking(SpriteBatch batch)
+	{
+		if (getFacingRight() == true)
+		{
 			moveRight();
-		} else {
+		}
+		else
+		{
 			moveLeft();
 		}
 		/*
@@ -260,9 +254,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 	}
 
 //Cooldowns
-	public boolean attackCooldownCheck() {
+	public boolean attackCooldownCheck()
+	{
 		attackCooldownTimer += 1;
-		if (attackCooldownTimer >= attackCooldownTimerDefault) {
+		if (attackCooldownTimer >= attackCooldownTimerDefault)
+		{
 			attackCooldownTimer = 0;
 			return false;
 		}
@@ -270,9 +266,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 		return true;
 	}
 
-	public boolean deflectCooldownCheck() {
+	public boolean deflectCooldownCheck()
+	{
 		deflectCooldownTimer += 1;
-		if (deflectCooldownTimer >= deflectCooldownTimerDefault) {
+		if (deflectCooldownTimer >= deflectCooldownTimerDefault)
+		{
 			deflectCooldownTimer = 0;
 			return false;
 		}
@@ -280,9 +278,11 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 		return true;
 	}
 
-	public boolean dashCooldownCheck() {
+	public boolean dashCooldownCheck()
+	{
 		dashCooldownTimer += 1;
-		if (dashCooldownTimer >= dashCooldownTimerDefault) {
+		if (dashCooldownTimer >= dashCooldownTimerDefault)
+		{
 			dashCooldownTimer = 0;
 			return false;
 		}
@@ -290,19 +290,23 @@ public class CharacterPlayer<Move extends IMovement> extends Character<Move> {
 		return true;
 	}
 
-	public void blockOrDeflect(CharacterState CharacterState) {
-		if (Gdx.input.isKeyPressed(Input.Keys.X)) {
+	public void blockOrDeflect(CharacterState CharacterState)
+	{
+		if (Gdx.input.isKeyPressed(Input.Keys.X))
+		{
 
 		}
 	}
 
 	@Override
-	public void blockOrDeflect() {
+	public void blockOrDeflect()
+	{
 		// TODO Auto-generated method stub
 
 	}
 
-	public void changeAttackHitboxPosition(Rectangle attackHitbox) {
+	public void changeAttackHitboxPosition(Rectangle attackHitbox)
+	{
 		attackHitbox.x = getFacingRight() ? getPosX() + 50 : getPosX() - 50;
 		attackHitbox.y = getPosY();
 	}

@@ -5,20 +5,13 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class BreakableObject extends Entity
 {
-	public BreakableObject(Texture sprite)
+	public BreakableObject(Texture sprite, float initialPosX, float initialPosY)
 	{
-		super(sprite);
+		super(sprite, initialPosX, initialPosY);
 	}
-
-	@Override
-	public Rectangle createHitbox() {
-		Rectangle hitbox = new Rectangle();
-		hitbox.height = 50;
-		hitbox.width = 50;
-		
-		return hitbox;
-	}
-
+	
+	
+	
 	@Override
 	public void collisionHit(Character<?> character) {
 		if (character == null || character.getTeam() == getTeam()) return;
@@ -35,5 +28,19 @@ public class BreakableObject extends Entity
 			default:
 				break;
 		}
+	}
+
+
+
+	@Override
+	public Rectangle createHitbox(float x, float y)
+	{
+		Rectangle hitbox = new Rectangle();
+		hitbox.height = 64;
+		hitbox.width = 64;
+		hitbox.x = x;
+		hitbox.y = y;
+
+		return hitbox;
 	}
 }

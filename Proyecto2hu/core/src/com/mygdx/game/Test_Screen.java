@@ -31,15 +31,8 @@ public class Test_Screen extends ScreenBase {
 		Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
 
 		// Creates a Player Entity
-		player = new CharacterPlayer<MoveByPixel>(
-				new Texture(Gdx.files.internal("ch14.png")), // Textura
-				new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")), // Textura
-				hurtSound, deflectingSound, succesfulDeflectSound, // Sonidos (deberían ser un arreglo mejor
-				"Youmu", // Nombre
-				100, // HP
-				Team.Player, // Equipo
-				true, // Puede recibir knockback?
-				new MoveByPixel()); // Tipo de movimiento
+		player = new CharacterPlayer<MoveByPixel>(new CharacterBuilder(),
+				new MoveByPixel(), 400, 20); // Tipo de movimiento
 
 		spawnAt(player, startingOffset, startingHeight, false);
 		
@@ -51,7 +44,7 @@ public class Test_Screen extends ScreenBase {
 		//player2.getHitbox().x = 100;
 		//player2.getHitbox().y = 100;
 
-		enemy = new CharacterBoss<MoveVectorial>(new BossData(0)); 
+		enemy = new CharacterBoss<MoveVectorial>(new BossData(0), 800, 20); 
 
 		spawnAt(enemy, startingOffset, startingHeight, true);
 		
@@ -69,7 +62,7 @@ public class Test_Screen extends ScreenBase {
 				100,
 				2,
 				false,
-				new MoveByPixel()));
+				new MoveByPixel(), enemy.getPosX(), enemy.getPosY()));
 		System.out.println("Proyectile Created");
 		addEntity(new Projectile<MoveSine>(
 				new Texture(Gdx.files.internal("Proyectil_1.png")),
@@ -78,7 +71,7 @@ public class Test_Screen extends ScreenBase {
 				10f,
 				2,
 				false,
-				new MoveSine()));
+				new MoveSine(), enemy.getPosX(), enemy.getPosY()));
 		System.out.println("Proyectile Created");
 		
 		// Creating the Tree of Doom
@@ -89,7 +82,7 @@ public class Test_Screen extends ScreenBase {
 				10f,
 				0,
 				false,
-				new MoveByPixel()));
+				new MoveByPixel(), 800,20));
 		System.out.println("Proyectile Created");
 		
 		/*for (int i = 0 ; i < projectilesList.size() ; i++)
@@ -98,7 +91,7 @@ public class Test_Screen extends ScreenBase {
 		}*/
 		for (int i = 0 ; i < (Math.random()*(maximumBreakableObjects - minimumBreakableObjects + 1)+minimumBreakableObjects) ; i++)
 		{
-			BreakableObject newObject = new BreakableObject(new Texture(Gdx.files.internal("Proyectil_2.png")));
+			BreakableObject newObject = new BreakableObject(new Texture(Gdx.files.internal("Proyectil_2.png")), 500,500);
 			addEntity(newObject);
 			spawnAtRandomX(newObject, startingHeight);
 		}

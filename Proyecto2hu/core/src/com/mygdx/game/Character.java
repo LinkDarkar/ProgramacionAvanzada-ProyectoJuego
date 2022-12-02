@@ -52,10 +52,11 @@ public abstract class Character<Move extends IMovement> extends Entity
 	private boolean canTakeKnockback = true;
 	private boolean knockbackDirection;
 	
-	public Character(Texture spriteTable, Texture sprite, Sound hurtSound, Sound succesfulDeflectSound,
-			String name, int health, Team team, boolean canTakeKnockback, Move move)
+	public Character(Texture sprite, Sound hurtSound, Sound succesfulDeflectSound,
+			String name, int health, Team team, boolean canTakeKnockback, Move move,
+			float initialPosX, float initialPosY)
 	{
-		super(sprite, team);
+		super(sprite, team, initialPosX, initialPosY);
 		
 		this.swordHitboxTexture = new Texture("penitent_rangeAttack_projectile_anim_4.png");
 		this.hurtSound = hurtSound;
@@ -72,9 +73,9 @@ public abstract class Character<Move extends IMovement> extends Entity
 	}
 	
 	public Character(Texture sprite, String name, int health, boolean canTakeKnockback,
-			Move move)
+			Move move, float initialPosX, float initialPosY)
 	{
-		super(sprite);
+		super(sprite,initialPosX,initialPosY);
 		this.swordHitboxTexture = new Texture("penitent_rangeAttack_projectile_anim_4.png");
 		this.nombre = name;
 		setHealth(health);
@@ -132,6 +133,14 @@ public abstract class Character<Move extends IMovement> extends Entity
 	public Move getMove()
 	{
 		return move;
+	}
+	public Sound getSuccesfulDeflectSound ()
+	{
+		return this.succesfulDeflectSound;
+	}
+	public Sound getHurtSound ()
+	{
+		return this.hurtSound;
 	}
 	
 	public void setXvel (int newVel)

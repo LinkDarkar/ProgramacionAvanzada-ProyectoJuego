@@ -29,11 +29,12 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 	private int currentAttack = 1;
 	boolean attackInCooldown = false;
 
-	public CharacterBoss (BossData data)
+	public CharacterBoss (BossData data, float initialPosX, float initialPosY)
 	{
-		super(data.getIdle(), data.getName(), data.getHp(), false, null);
+		super(data.getIdle(), data.getName(), data.getHp(), false, null, initialPosX,initialPosY);
 		this.attackAnimation = data.importAttackAnimations();
 		this.attacksList = data.importAttackPatternData();
+		this.changeTeam(Team.IA);
 	}
 	public void createAttackHitbox()
 	{
@@ -63,15 +64,28 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 				}
 				if(Gdx.input.isKeyJustPressed(Input.Keys.O))
 				{
+					/*
 					ScreenBase.Instance.addEntity(new Projectile<MoveByPixel>(
 							new Texture(Gdx.files.internal("Proyectil_4.png")),
 							getTeam(),
 							500,
 							100,
 							2,
-							false,
-							new MoveByPixel())
-						);
+							this.getFacingRight(),
+							new MoveByPixel(),this.getPosX()+(this.getHitboxWidth()/2), this.getPosY()+(this.getHitboxHeight()/2))
+						);*/
+					Projectile proyectilTest = new Projectile<MoveSine>(
+							new Texture(Gdx.files.internal("Proyectil_4.png")),
+							getTeam(),
+							500,
+							100,
+							2,
+							this.getFacingRight(),
+							new MoveSine(2),
+							this.getPosX()+(this.getHitboxWidth()/2),
+							this.getPosY()+(this.getHitboxHeight()/2));
+					ScreenBase.Instance.addEntity(proyectilTest);
+					System.out.println("equipo proyectil = "+ proyectilTest.getTeam());
 				}
 				
 				/*this.getMove().continueMoving(getHitbox());
@@ -229,5 +243,16 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 		attackHitbox.x = getFacingRight() ? getPosX() + getAttackHitbox().width : getPosX() - getAttackHitbox().width;
 		attackHitbox.y = getPosY();
 		
+	}
+	@Override
+	public Rectangle createHitbox(float x, float y)
+	{
+		Rectangle hitbox = new Rectangle();
+		hitbox.height = 64;
+		hitbox.width = 64;
+		hitbox.x = x;
+		hitbox.y = y;
+
+		return hitbox;
 	}
 }

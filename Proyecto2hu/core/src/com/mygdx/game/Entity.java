@@ -25,22 +25,22 @@ public abstract class Entity
 		Neutral
 	}
 	
-	public Entity (Texture sprite)
+	public Entity (Texture sprite, float initialPosX, float initialPosY)
 	{
 		this.shapeRenderer = new ShapeRenderer();	//Debug
 		this.shapeRenderer.setAutoShapeType(true);	//Debug
-		this.hitbox = this.createHitbox();
+		this.hitbox = this.createHitbox(initialPosX,initialPosY);
 		this.sprite = sprite;
 		this.centerX = hitbox.width/2;
 		this.team = Team.Neutral;
 		
 		//this.canGetHitList = new ArrayList<Entity>(); 
 	}
-	public Entity (Texture sprite, Team team)
+	public Entity (Texture sprite, Team team, float initialPosX, float initialPosY)
 	{
 		this.shapeRenderer = new ShapeRenderer();	//Debug
 		this.shapeRenderer.setAutoShapeType(true);	//Debug
-		this.hitbox = this.createHitbox();
+		this.hitbox = this.createHitbox(initialPosX,initialPosY);
 		this.sprite = sprite;
 		this.centerX = hitbox.width/2;
 		this.team = team;

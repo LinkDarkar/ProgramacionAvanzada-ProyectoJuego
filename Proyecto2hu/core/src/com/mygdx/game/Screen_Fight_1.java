@@ -27,28 +27,18 @@ public class Screen_Fight_1 extends ScreenBase {
 	{
 		super(game);
 		int startingOffset = 200;
-		Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
-		Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
-		Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
 
 		listOfEntities = new ArrayList<Entity>();
 
 		// Creates a Player Entity
-		player = new CharacterPlayer<MoveByPixel>(
-				new Texture(Gdx.files.internal("ch14.png")), // Textura
-				new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png")), // Textura
-				hurtSound, deflectingSound, succesfulDeflectSound, // Sonidos (deberían ser un arreglo mejor
-				"Youmu", // Nombre
-				100, // HP
-				Team.Player, // Equipo
-				true, // Puede recibir knockback?
-				new MoveByPixel()); // Tipo de movimiento
+		player = new CharacterPlayer<MoveByPixel>(new CharacterBuilder(),
+				new MoveByPixel(), 400, 20);
 
 		spawnAt(player, startingOffset, startingHeight, false);
 		
 		listOfEntities.add(player);
 
-		enemy = new CharacterBoss<MoveVectorial>(new BossData(0)); 
+		enemy = new CharacterBoss<MoveVectorial>(new BossData(0), 800, 20); 
 
 		spawnAt(enemy, startingOffset, startingHeight, true);
 		
