@@ -59,8 +59,8 @@ public class Projectile<Move extends IMovement> extends Entity
 		Rectangle hitbox = new Rectangle();
 		hitbox.height = 32;
 		hitbox.width = 32;
-		hitbox.x = x;
-		hitbox.y = y;
+		hitbox.x = x - getHitboxWidth();
+		hitbox.y = y - getHitboxHeight();
 		
 		return hitbox;
 	}

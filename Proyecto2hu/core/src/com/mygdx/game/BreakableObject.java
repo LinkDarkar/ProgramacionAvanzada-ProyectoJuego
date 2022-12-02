@@ -8,6 +8,7 @@ public class BreakableObject extends Entity
 	public BreakableObject(Texture sprite, float initialPosX, float initialPosY)
 	{
 		super(sprite, initialPosX, initialPosY);
+		setHealth(5);
 	}
 	
 	

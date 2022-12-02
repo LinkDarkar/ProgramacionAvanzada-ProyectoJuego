@@ -76,15 +76,16 @@ public class CharacterBoss<Move extends IMovement> extends Character<Move>
 						);*/
 					@SuppressWarnings("rawtypes")
 					Projectile proyectilTest = new Projectile<MoveSine>(
-							new Texture(Gdx.files.internal("Proyectil_4.png")),
-							getTeam(),
-							500,
-							100,
-							2,
-							this.getFacingRight(),
-							new MoveSine(5, 3),
-							this.getPosX()+(this.getHitboxWidth()/2),
-							this.getPosY()+(this.getHitboxHeight()/2));
+						new Texture(Gdx.files.internal("Proyectil_4.png")),
+						getTeam(),
+						500,
+						100,
+						2,
+						this.getFacingRight(),
+						new MoveSine(5, 3),
+						this.getPosX()+(this.getHitboxWidth()/2),
+						this.getPosY()+(this.getHitboxHeight()/2)
+					);
 					ScreenBase.Instance.addEntity(proyectilTest);
 					System.out.println("equipo proyectil = "+ proyectilTest.getTeam());
 				}

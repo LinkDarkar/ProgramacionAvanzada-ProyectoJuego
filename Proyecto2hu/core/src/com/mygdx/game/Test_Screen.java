@@ -94,6 +94,7 @@ public class Test_Screen extends ScreenBase {
 			BreakableObject newObject = new BreakableObject(new Texture(Gdx.files.internal("Proyectil_2.png")), 500,500);
 			addEntity(newObject);
 			spawnAtRandomX(newObject, startingHeight);
+			System.out.println("BO Creado");
 		}
 		
 		setVoidColor(new Color(0.6f,0.8f,0.8f,1));
