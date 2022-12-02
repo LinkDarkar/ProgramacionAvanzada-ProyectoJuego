@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class MoveSine implements IMovement
 {
-    private static double current = 0;
+    private double current = 0;
     private float verticalSpeed = 1;
     private float frecuency = .5f;
     
