@@ -203,17 +203,42 @@ public class ScreenBase implements Screen {
 		return (getCameraHeight() - layout.height - offset);
 	}
 	
+	public float getHorizontalCenterForEntity(Entity entity)
+	{
+		return (getCameraWidth()/2) - (entity.getHitboxWidth()/2);
+	}
+	public float getVerticalCenterForEntity(Entity entity)
+	{
+		return (getCameraHeight()/2) - (entity.getHitboxHeight()/2);
+	}
+	public float getPositionFromRightForEntity(Entity entity)
+	{
+		return (getCameraWidth() - entity.getHitboxWidth());
+	}
+	public float getPositionFromTopForEntity(Entity entity)
+	{
+		return (getCameraHeight() - entity.getHitboxHeight());
+	}
+	public float getPositionFromRightForEntity(Entity entity, float offset)
+	{
+		return (getCameraWidth() - entity.getHitboxWidth() - offset);
+	}
+	public float getPositionFromTopForEntity(Entity entity, float offset)
+	{
+		return (getCameraHeight() - entity.getHitboxHeight() - offset);
+	}
+	
 	// Spawns at an OffSet from the center to the Left (false) or the Right (true)
 	protected void spawnAt(Entity entity, int offSet, int height, boolean rightSideFromCenter)
 	{
 		if (rightSideFromCenter) entity.moveTo((getCameraWidth()/2) + offSet, height);
 		else entity.moveTo((getCameraWidth()/2) - offSet, height);
 	}
-	protected void spawnAt(Entity entity, int x, int y)
+	protected void spawnAt(Entity entity, float x, float y)
 	{
 		entity.moveTo(x, y);
 	}
-	protected void spawnAtRandomX(Entity entity, int y)
+	protected void spawnAtRandomX(Entity entity, float y)
 	{
 		spawnAt(entity, (int)(Math.random()*(getCameraWidth() - entity.getHitboxWidth())), y);
 	}

@@ -1,79 +1,55 @@
 package com.mygdx.game;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.Entity.Team;
 
 public class Screen_Fight_1 extends ScreenBase {
 	private CharacterPlayer player;
 	private CharacterBoss enemy;
-	private ArrayList<Projectile> projectilesList;
 	private int startingHeight = 60;
 	private float timeCounter = 0;
 	private float returningCount = 3;
-
-	ArrayList<Entity> listOfEntities;
 
 	// Se ejecuta siempre que se llege a esta pantalla
 	public Screen_Fight_1(Proyecto2hu game)
 	{
 		super(game);
+		setInstance(this);
 		int startingOffset = 200;
-
-		listOfEntities = new ArrayList<Entity>();
 
 		// Creates a Player Entity
 		player = new CharacterPlayer(new CharacterBuilder(),
-				new MoveByPixel(), 400, 20);
+				new MoveByPixel(), 400, 20); // Tipo de movimiento
 
 		spawnAt(player, startingOffset, startingHeight, false);
-		
-		listOfEntities.add(player);
+		addEntity(player);
 
-		enemy = new CharacterBoss(new BossData(0), 800, 20); 
 
+		enemy = new CharacterBoss(new BossData(1), 800, 20);
+		enemy.setFoe(player);
 		spawnAt(enemy, startingOffset, startingHeight, true);
+		addEntity(enemy);
 		
-		listOfEntities.add(enemy);
-		
-		// Creates the new Projectiles List
-		projectilesList = new ArrayList<Projectile>();
-		
-		// Creates a predefined layout of BreakableObjects
-		listOfEntities.add(new BreakableObject(new Texture("Barril_1.png"), 3, 20, startingHeight));
-		listOfEntities.add(new BreakableObject(new Texture("Barril_1.png"), 3, 60, startingHeight));
-		listOfEntities.add(new BreakableObject(new Texture("Barril_2.png"), 1, 600, startingHeight));
-		listOfEntities.add(new BreakableObject(new Texture("Silla_1.png"), 5, 400, startingHeight));
-		listOfEntities.add(new BreakableObject(new Texture("Silla_1.png"), 5, 430, startingHeight));
-		listOfEntities.add(new BreakableObject(new Texture("Candelabro_1.png"), 1, 0, startingHeight));
-		listOfEntities.add(new BreakableObject(new Texture("Candelabro_1.png"), 1, 700, startingHeight));
+		createAndPlaceBreakableObjects();
 
-		
-		setVoidColor(new Color(0.6f,0.7f,0.5f,1));
+		setVoidColor(new Color(0.6f,0.8f,0.8f,1));
 	}
 
 	@Override
 	public void RenderFrame()
 	{
 		getBatch().draw(new Texture(Gdx.files.internal("floor.png")), 0, 0);
-		if (!player.renderFrame(getBatch(), listOfEntities)) listOfEntities.remove(player);
-		if (!enemy.renderFrame(getBatch(), listOfEntities)) listOfEntities.remove(enemy);
-
-		for (int i = 0 ; i < projectilesList.size() ; i++)
+		for (int i = listOfEntities.size() - 1 ; i >= 0 ; i--)
 		{
-			Projectile currentProjectile = projectilesList.get(i);
-			if(!currentProjectile.renderFrame(getBatch(), null))
+			Entity currentEntity = listOfEntities.get(i);
+			if(!currentEntity.renderFrame(getBatch(), listOfEntities))
 			{
-				System.out.println("Removiendo Projectil");
-				projectilesList.remove(currentProjectile);
-				listOfEntities.remove(currentProjectile);
-				currentProjectile.dispose();
+				if (!listOfEntities.remove(currentEntity)) System.out.println("Couldn't remove Entity from List");
+				else System.out.println("Removed Successfully");
+				currentEntity.dispose();
 				i--;
 				continue;
 			}
@@ -85,10 +61,10 @@ public class Screen_Fight_1 extends ScreenBase {
 	{
 		setTextScale(2,2);
 
-		String text_Player_HP = "Vida Jugador ["+player.getHealth()+"]";
+		String text_Player_HP = "Vida Jugador ["+(player == null ? 0 : player.getHealth())+"]";
 		drawText(text_Player_HP, 50, 475);
 
-		String text_Enemy_HP = "["+enemy.getHealth()+"] Vida Enemigo";
+		String text_Enemy_HP = "["+(enemy == null ? 0 : enemy.getHealth())+"] Vida Enemigo";
 		drawText(text_Enemy_HP, getPositionFromRightForText(text_Enemy_HP, 50), 475);
 
 		String exitingString =  "Saliendo en "+ Math.floor(returningCount * 10) / 10+"...";
@@ -121,5 +97,38 @@ public class Screen_Fight_1 extends ScreenBase {
 			}
 		}
 		else returningCount = 3;
+	}
+	
+	private void createAndPlaceBreakableObjects()
+	{
+		BreakableObject newObject;
+
+		newObject = new BreakableObject(new Texture("Barril_1.png"), 3, 0, startingHeight);
+		newObject.moveTo(120, startingHeight);
+		listOfEntities.add(newObject);
+
+		newObject = new BreakableObject(new Texture("Barril_1.png"), 3, 0, startingHeight);
+		newObject.moveTo(120+newObject.getHitboxWidth(), startingHeight);
+		listOfEntities.add(newObject);
+
+		newObject = new BreakableObject(new Texture("Barril_2.png"), 2, 0, startingHeight);
+		newObject.moveTo(getPositionFromRightForEntity(newObject, 30), startingHeight);
+		listOfEntities.add(newObject);
+		
+		newObject = new BreakableObject(new Texture("Silla_1.png"), 5, 430, startingHeight);
+		newObject.moveTo(getHorizontalCenterForEntity(newObject)-20, startingHeight);
+		listOfEntities.add(newObject);
+		
+		newObject = new BreakableObject(new Texture("Silla_1.png"), 5, 430, startingHeight);
+		newObject.moveTo(getHorizontalCenterForEntity(newObject)+20, startingHeight);
+		listOfEntities.add(newObject);
+		
+		newObject = new BreakableObject(new Texture("Candelabro_1.png"), 1, 0, startingHeight);
+		newObject.moveTo(0, startingHeight);
+		listOfEntities.add(newObject);
+		
+		newObject = new BreakableObject(new Texture("Candelabro_1.png"), 1, 0, startingHeight);
+		newObject.moveTo(getPositionFromRightForEntity(newObject), startingHeight);
+		listOfEntities.add(newObject);
 	}
 }

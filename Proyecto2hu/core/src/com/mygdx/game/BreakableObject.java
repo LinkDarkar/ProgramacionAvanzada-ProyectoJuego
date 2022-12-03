@@ -11,8 +11,6 @@ public class BreakableObject extends Entity
 		setHealth(health);
 	}
 	
-	
-	
 	@Override
 	public void collisionHit(Character character) {
 		if (character == null || character.getTeam() == getTeam()) return;
@@ -38,8 +36,8 @@ public class BreakableObject extends Entity
 	public Rectangle createHitbox(float x, float y)
 	{
 		Rectangle hitbox = new Rectangle();
-		hitbox.height = 64;
-		hitbox.width = 64;
+		hitbox.height = getSprite() == null ? 32 : getSpriteHeight();
+		hitbox.width = getSprite() == null ? 32 : getSpriteWidth();
 		hitbox.x = x;
 		hitbox.y = y;
 

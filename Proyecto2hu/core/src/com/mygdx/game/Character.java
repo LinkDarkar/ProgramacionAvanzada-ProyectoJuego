@@ -53,7 +53,7 @@ public abstract class Character extends Entity
 	private boolean knockbackDirection;
 	
 	public Character(Texture sprite, Sound hurtSound, Sound succesfulDeflectSound,
-			String name, int health, Team team, boolean canTakeKnockback, IMovement move,
+			String name, int health, int damage, Team team, boolean canTakeKnockback, IMovement move,
 			float initialPosX, float initialPosY)
 	{
 		super(sprite, team, initialPosX, initialPosY);
@@ -63,6 +63,7 @@ public abstract class Character extends Entity
 		this.succesfulDeflectSound = succesfulDeflectSound;
 		this.nombre = name;
 		setHealth(health);
+		this.damage = damage;
 		this.posture = 0;
 		this.facingRight = true;
 		this.xvel = 130;
@@ -72,13 +73,14 @@ public abstract class Character extends Entity
 		createAttackHitbox();
 	}
 	
-	public Character(Texture sprite, String name, int health, boolean canTakeKnockback,
+	public Character(Texture sprite, String name, int health, int damage, boolean canTakeKnockback,
 			IMovement move, float initialPosX, float initialPosY)
 	{
 		super(sprite,initialPosX,initialPosY);
 		this.swordHitboxTexture = new Texture("penitent_rangeAttack_projectile_anim_4.png");
 		this.nombre = name;
 		setHealth(health);
+		this.damage = damage;
 		this.posture = 0;
 		this.facingRight = false;
 		this.xvel = 600;
@@ -138,7 +140,7 @@ public abstract class Character extends Entity
 	{
 		return this.hurtSound;
 	}
-	
+
 	public void setXvel (int newVel)
 	{
 		this.xvel = newVel;
@@ -203,7 +205,7 @@ public abstract class Character extends Entity
 			}
 			else
 			{
-				this.takeDamage(2);
+				this.takeDamage(characterAggresor.getDamage());
 				if (canTakeKnockback) takeKnockback(0.115f, 115, characterAggresor.getFacingRight());
 				this.setCanGetHit(false);
 				hurtSound.play(0.2f);
@@ -317,7 +319,7 @@ public abstract class Character extends Entity
 				break;
 		}
 		
-		batch.draw(this.swordHitboxTexture, attackHitbox.x, attackHitbox.y);
+		//batch.draw(this.swordHitboxTexture, attackHitbox.x, attackHitbox.y);
 		//debugSwordHitboxViewerRender();
 		return true;
 	}

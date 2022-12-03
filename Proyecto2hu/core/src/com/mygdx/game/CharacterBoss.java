@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.mygdx.game.Character.CharacterState;
 
 public class CharacterBoss extends Character
 {	
@@ -20,9 +19,10 @@ public class CharacterBoss extends Character
 	 * del personaje
 	 * */
 	//private Sound attackSound = Gdx.audio.newSound(Gdx.files.internal("pl_deflect01.wav"));
-	private boolean playAttackSound = true;
+	//private boolean playAttackSound = true;
 	private ArrayList<IAttack> attacksList;							//donde se guarda los datos de los ataques
 	private ArrayList<Animation<TextureRegion>> attackAnimation;	//donde se guarda la animación de los ataques
+	private Animation<TextureRegion> walkingAnimation;
 	private int attackMovementTimer;
 	private int attackMovementTimerDefault = 60;
 	private boolean attackInCooldown = false; // indica si el ataque está en cooldown
@@ -37,11 +37,12 @@ public class CharacterBoss extends Character
 
 	public CharacterBoss (BossData data, float initialPosX, float initialPosY)
 	{
-		super(data.getIdle(), data.getName(), data.getHp(), false, null, initialPosX,initialPosY);
+		super(data.getIdle(), data.getName(), data.getHp(), data.getDamage(), false, null, initialPosX,initialPosY);
 		this.attackAnimation = data.importAttackAnimations();
 		this.attacksList = data.importAttackPatternData();
 		this.changeTeam(Team.IA);
 		this.setXvel(100);
+		this.walkingAnimation = data.getWalkingAnimation();
 	}
 	public void createAttackHitbox()
 	{
@@ -132,8 +133,16 @@ public class CharacterBoss extends Character
 			attackInCooldown = attackMovementCooldownCheck();
 		}
 		
-		if (getHitboxPosition_X() < 20) setHitboxPosition_X(20);
-		if (getHitboxPosition_X() > 780 - getHitboxWidth()) setHitboxPosition_X(780 - getHitboxWidth());
+		if (getHitboxPosition_X() < 20)
+		{
+			setHitboxPosition_X(20);
+			this.setCharacterState(CharacterState.idle);
+		}
+		if (getHitboxPosition_X() > 780 - getHitboxWidth())
+		{
+			setHitboxPosition_X(780 - getHitboxWidth());
+			this.setCharacterState(CharacterState.idle);
+		}
 	}
 
 	public void collisionHit (Character characterAggresor)
@@ -166,7 +175,7 @@ public class CharacterBoss extends Character
 			{
 				hitsTakenRecently++;
 				resetHitsTimer = 2f;
-				this.takeDamage(2);
+				this.takeDamage(characterAggresor.getDamage());
 				this.setCanGetHit(false);
 				this.getHurtSound().play(0.2f);
 				System.out.println("damageDone = true");
@@ -257,8 +266,9 @@ public class CharacterBoss extends Character
 
 	@Override
 	public void walking(SpriteBatch batch) {
-		// TODO Auto-generated method stub
-		
+		stateTime += Gdx.graphics.getDeltaTime() * ((float) getXvel() / 100);
+		batch.draw(walkingAnimation.getKeyFrame(stateTime, true), getFacingRight() ? getPosX() : getPosX() + 64,
+				getPosY(), getFacingRight() ? walkingAnimation.getKeyFrame(stateTime, true).getRegionWidth() : -walkingAnimation.getKeyFrame(stateTime, true).getRegionWidth(), walkingAnimation.getKeyFrame(stateTime, true).getRegionHeight());
 	}
 
 	@Override
@@ -334,6 +344,7 @@ public class CharacterBoss extends Character
 	}
 	public float getDistanceFromFoe()
 	{
+		if (currentFoe == null) return Float.MAX_VALUE;
 		return Math.abs((getHitboxPosition_X() + (getHitboxWidth()/2)) - (currentFoe.getHitboxPosition_X() + (currentFoe.getHitboxWidth()/2)));
 	}
 
@@ -341,7 +352,6 @@ public class CharacterBoss extends Character
 	{
 		attackHitbox.x = getFacingRight() ? getPosX() + getAttackHitbox().width : getPosX() - getAttackHitbox().width;
 		attackHitbox.y = getPosY();
-		
 	}
 	@Override
 	public Rectangle createHitbox(float x, float y)

@@ -6,13 +6,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
-import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.Entity.Team;
 
-public class CharacterBuilder implements ICharacterTest
+public class CharacterBuilder
 {
 	private Texture auxTexture; // donde se guarda el spritemap
-	TextureRegion[] auxAnimationFrames; // donde se guardan los frames
+	private TextureRegion[] auxAnimationFrames; // donde se guardan los frames
 	private Animation<TextureRegion> attackAnimation;
 	private Animation<TextureRegion> deflectAnimation;
 	private Animation<TextureRegion> walkingAnimation;
@@ -22,12 +21,12 @@ public class CharacterBuilder implements ICharacterTest
 	
 	private Texture sprite = new Texture(Gdx.files.internal("SpriteTestCharacterPlayer.png"));;
 	
-	Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
-	Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
-	Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
+	private Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
+	private Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
+	private Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
 	
 	private String name = "Youmu";
-	private int health = 100;
+	private int health = 6;
 	private Team team = Team.Player;
 	private boolean canTakeKnockback = true;
 	

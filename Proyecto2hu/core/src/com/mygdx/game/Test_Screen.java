@@ -2,7 +2,6 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,9 +23,9 @@ public class Test_Screen extends ScreenBase {
 		super(game);
 		setInstance(this);
 		int startingOffset = 200;
-		Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
-		Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
-		Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
+		//Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
+		//Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
+		//Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
 
 		// Creates a Player Entity
 		player = new CharacterPlayer(new CharacterBuilder(),
@@ -42,7 +41,7 @@ public class Test_Screen extends ScreenBase {
 		//player2.getHitbox().x = 100;
 		//player2.getHitbox().y = 100;
 
-		enemy = new CharacterBoss(new BossData(0), 800, 20);
+		enemy = new CharacterBoss(new BossData(1), 800, 20);
 		
 		enemy.setFoe(player);
 
@@ -109,7 +108,7 @@ public class Test_Screen extends ScreenBase {
 		listOfEntities.add(new BreakableObject(new Texture("Candelabro_1.png"), 1, 0, startingHeight));
 		listOfEntities.add(new BreakableObject(new Texture("Candelabro_1.png"), 1, 700, startingHeight));
 		
-		setVoidColor(new Color(0.6f,0.8f,0.8f,1));
+		setVoidColor(new Color(0.5f,0.5f,0.5f,1));
 	}
 
 	@Override

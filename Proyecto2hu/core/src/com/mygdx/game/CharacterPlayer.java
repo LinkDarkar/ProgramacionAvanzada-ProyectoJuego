@@ -55,7 +55,7 @@ public class CharacterPlayer extends Character
 	public CharacterPlayer(CharacterBuilder characterBuilder, IMovement move, float initialPosX, float initialPosY)
 	{
 		super(characterBuilder.getSprite(), characterBuilder.getHurtSound(), characterBuilder.getSuccesfulDeflectSount(), 
-				characterBuilder.getName(), characterBuilder.getHealth(), characterBuilder.getTeam(),
+				characterBuilder.getName(), characterBuilder.getHealth(), 1, characterBuilder.getTeam(),
 				characterBuilder.getCanTakeKnockback(), move, initialPosX, initialPosY);
 		this.deflectingSound = characterBuilder.getDeflectingSound();
 		this.attackAnimation = characterBuilder.getAttackAnimation();

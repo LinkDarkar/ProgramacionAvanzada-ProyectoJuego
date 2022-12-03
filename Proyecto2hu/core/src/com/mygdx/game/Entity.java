@@ -16,7 +16,7 @@ public abstract class Entity
 	private int health;
 	private boolean canGetHit = true;
 	private Texture sprite;
-	private float centerX;
+	//private float centerX;
 	private Team team;
 	public enum Team
 	{
@@ -29,9 +29,9 @@ public abstract class Entity
 	{
 		this.shapeRenderer = new ShapeRenderer();	//Debug
 		this.shapeRenderer.setAutoShapeType(true);	//Debug
-		this.hitbox = this.createHitbox(initialPosX,initialPosY);
 		this.sprite = sprite;
-		this.centerX = hitbox.width/2;
+		this.hitbox = this.createHitbox(initialPosX,initialPosY);
+		//this.centerX = hitbox.width/2;
 		this.team = Team.Neutral;
 		
 		//this.canGetHitList = new ArrayList<Entity>(); 
@@ -40,9 +40,9 @@ public abstract class Entity
 	{
 		this.shapeRenderer = new ShapeRenderer();	//Debug
 		this.shapeRenderer.setAutoShapeType(true);	//Debug
-		this.hitbox = this.createHitbox(initialPosX,initialPosY);
 		this.sprite = sprite;
-		this.centerX = hitbox.width/2;
+		this.hitbox = this.createHitbox(initialPosX,initialPosY);
+		//this.centerX = hitbox.width/2;
 		this.team = team;
 		
 		//this.canGetHitList = new ArrayList<Entity>(); 
@@ -125,6 +125,14 @@ public abstract class Entity
 	{
 		return this.sprite;
 	}
+	public float getSpriteWidth()
+	{
+		return this.sprite.getWidth();
+	}
+	public float getSpriteHeight()
+	{
+		return this.sprite.getHeight();
+	}
 	public Team getTeam()
 	{
 		return team;
@@ -136,7 +144,7 @@ public abstract class Entity
 	
 	public void moveTo(float x, float y)
 	{
-		this.hitbox.x = x - centerX;
+		this.hitbox.x = x;
 		this.hitbox.y = y;
 	}
 	

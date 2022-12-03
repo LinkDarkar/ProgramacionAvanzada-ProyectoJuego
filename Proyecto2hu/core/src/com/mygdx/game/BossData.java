@@ -6,36 +6,60 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.math.Rectangle;
 
 public class BossData
 {
-	String name;	//nombre
-	Texture idle;	//sprite que tendrá en estado idle
-	int hp;			//la vida que tendrá
-	int amountAttacks;	//la cantidad de ataques que tendrá
-	int[][] attackPatternData;	//Un arreglo de dos dimensiones que guardara en arreglos los datos de los ataques
-	Object[][] attackAnimationData;	//Un arreglo de dos dimensiones que guarda en arreglos los datos de la animacion de ataques
-	int [][][] attackPatternHitboxData;
+	private String name;	//nombre
+	private Texture idle;	//sprite que tendrá en estado idle
+	private int hp;			//la vida que tendrá
+	private int damage;
+	private int amountAttacks;	//la cantidad de ataques que tendrá
+	private int [][] attackPatternData;	//Un arreglo de dos dimensiones que guardara en arreglos los datos de los ataques
+	private Object[][] attackAnimationData;	//Un arreglo de dos dimensiones que guarda en arreglos los datos de la animacion de ataques
+	private int [][][] attackPatternHitboxData;
+	private Texture auxTexture;
+	private TextureRegion[] auxAnimationFrames;
+	private Animation<TextureRegion> walkingAnimation;
 
 	public BossData (int code)
 	{
 		switch (code)
 		{
-			case 0:
+			case 1:
 				//{framesDeDuracion,fasesAtaque(N)(siempre es par),frame1,...,frameN}
-				int [][] auxAttackPatternData = {{50,2,32,34}};
+				int [][] auxAttackPatternData1 = {{50,2,32,34}};
 				//{{dimX1,dimY1},...,{dimXN,dimYN}}
-				int [][][] auxAttackPatternHitbox = {{{40,20},{100,50}}};
+				int [][][] auxAttackPatternHitbox1 = {{{40,20},{100,50}}};
 				//{SpriteMap,DimensionX,DimensionY,tiempoDuracionPorFrame}
-				Object[][] auxAttackAnimationData = {{"reisenAttackKick.png",64,64,6,0.11f}};
+				Object[][] auxAttackAnimationData1 = {{"reisenAttackKick.png",64,64,6,0.11f}};
 				this.name = "Miriam";
 				this.idle = new Texture(Gdx.files.internal("MiriamIdleAnim_0.png"));
-				this.hp = 100;
+				this.hp = 10;
 				this.amountAttacks = 1;
-				this.attackPatternData = auxAttackPatternData;
-				this.attackAnimationData = auxAttackAnimationData;
-				this.attackPatternHitboxData = auxAttackPatternHitbox;
+				this.attackPatternData = auxAttackPatternData1;
+				this.attackAnimationData = auxAttackAnimationData1;
+				this.attackPatternHitboxData = auxAttackPatternHitbox1;
+				this.damage = 2;
+				createWalkingAnimation();
+				break;
+			case 2:
+				//{framesDeDuracion,fasesAtaque(N)(siempre es par),frame1,...,frameN}
+				int [][] auxAttackPatternData2 = {{50,2,32,34}};
+				//{{dimX1,dimY1},...,{dimXN,dimYN}}
+				int [][][] auxAttackPatternHitbox2 = {{{40,20},{100,50}}};
+				//{SpriteMap,DimensionX,DimensionY,tiempoDuracionPorFrame}
+				Object[][] auxAttackAnimationData2 = {{"reisenAttackKick.png",64,64,6,0.11f}};
+				this.name = "Miriam's Ghost";
+				this.idle = new Texture(Gdx.files.internal("MiriamIdleAnim_0.png"));
+				this.hp = 10;
+				this.amountAttacks = 1;
+				this.attackPatternData = auxAttackPatternData2;
+				this.attackAnimationData = auxAttackAnimationData2;
+				this.attackPatternHitboxData = auxAttackPatternHitbox2;
+				this.damage = 10;
+				createWalkingAnimation();
 				break;
 			default:
 				break;
@@ -54,6 +78,10 @@ public class BossData
 	{
 		return this.hp;
 	}
+	public int getDamage()
+	{
+		return this.damage;
+	}
 	public Rectangle setHitbox (int height, int width)
 	{
 		Rectangle hitbox = new Rectangle();
@@ -61,6 +89,21 @@ public class BossData
 		hitbox.width = width;
 		
 		return hitbox;
+	}
+	
+	public void createWalkingAnimation()
+	{
+		auxTexture = new Texture("reisenWalking.png");
+		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, 64, 64);
+
+		auxAnimationFrames = new TextureRegion[14];
+		for (int index = 0; index < 11; index += 1)
+		{
+			auxAnimationFrames[index] = tmpFrames[0][index];
+		}
+
+		walkingAnimation = new Animation<TextureRegion>(0.08f, auxAnimationFrames);
+		walkingAnimation.setPlayMode(PlayMode.LOOP);
 	}
 	
 	/* importAttackPatternData:
@@ -127,5 +170,8 @@ public class BossData
 		}
 		
 		return animationList;
+	}
+	public Animation<TextureRegion> getWalkingAnimation() {
+		return walkingAnimation;
 	}
 }
