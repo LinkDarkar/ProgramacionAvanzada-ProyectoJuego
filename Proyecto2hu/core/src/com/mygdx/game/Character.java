@@ -19,7 +19,6 @@ public abstract class Character extends Entity
 	private Sound succesfulDeflectSound;
 	
 	private String nombre;	//no se va a usar
-	private int posture;	//por si el combate está muy fácil, empezaría en 0
 	private int damage;
 	private int xvel;
 	private float knockbackCount = 0;
@@ -64,7 +63,6 @@ public abstract class Character extends Entity
 		this.nombre = name;
 		setHealth(health);
 		this.damage = damage;
-		this.posture = 0;
 		this.facingRight = true;
 		this.xvel = 130;
 		this.canTakeKnockback = canTakeKnockback;
@@ -81,7 +79,6 @@ public abstract class Character extends Entity
 		this.nombre = name;
 		setHealth(health);
 		this.damage = damage;
-		this.posture = 0;
 		this.facingRight = false;
 		this.xvel = 600;
 		this.canTakeKnockback = canTakeKnockback;
@@ -95,10 +92,6 @@ public abstract class Character extends Entity
 	public String getNombre()
 	{
 		return this.nombre;
-	}
-	public int getPosture()
-	{
-		return this.posture;
 	}
 	public int getDamage()
 	{

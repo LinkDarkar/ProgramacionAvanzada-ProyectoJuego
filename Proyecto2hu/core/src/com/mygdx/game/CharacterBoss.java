@@ -31,8 +31,9 @@ public class CharacterBoss extends Character
 	private float resetHitsTimer = 0;
 	private boolean moveForward;
 	
-	private Sound deflectingSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
 	
+	private Sound deflectingSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
+	private Texture deflecting;
 	private float contador = 0;
 
 	public CharacterBoss (BossData data, float initialPosX, float initialPosY)
@@ -43,6 +44,7 @@ public class CharacterBoss extends Character
 		this.changeTeam(Team.IA);
 		this.setXvel(100);
 		this.walkingAnimation = data.getWalkingAnimation();
+		this.deflecting = data.getDeflecting();
 	}
 	public void createAttackHitbox()
 	{
@@ -200,7 +202,6 @@ public class CharacterBoss extends Character
 				System.out.println("Case 0");
 				setChargingAttack(true);
 				setCharacterState(CharacterState.idle);
-				//renderAnimation(attackAnimation, batch);
 				break;
 			case 1: // the attack hitbox is Off but not finished
 				System.out.println("Case 1");
@@ -214,11 +215,28 @@ public class CharacterBoss extends Character
 				}
 				break;
 			case 2: // the attack hitbox is On
-				System.out.println("Case 2");
-				this.setAttackHitbox(attacksList.get(currentAttack).changeHitbox());
-				System.out.println("x = "+ getAttackHitbox().x);
-				System.out.println("y = "+ getAttackHitbox().y);
-				setChargingAttack(true);
+				if (attacksList.get(currentAttack) instanceof AttackPattern)
+				{
+					//System.out.println();
+					this.setAttackHitbox(attacksList.get(currentAttack).changeHitbox());
+					setChargingAttack(true);
+				}
+				else if (attacksList.get(currentAttack) instanceof RangedAttackPattern && getChargingAttack() == true)
+				{
+					Projectile proyectilTest = new Projectile(
+							new Texture(Gdx.files.internal("Proyectil_4.png")),
+							getTeam(),
+							500,
+							100,
+							2,
+							this.getFacingRight(),
+							new MoveSine(5, 3),
+							this.getPosX()+(this.getHitboxWidth()/2),
+							this.getPosY()+(this.getHitboxHeight()/2)
+						);
+						ScreenBase.getInstance().addEntity(proyectilTest);
+					setChargingAttack(false);
+				}
 				break;
 			default:
 				//System.out.println("Default Case");
@@ -259,8 +277,9 @@ public class CharacterBoss extends Character
 	}
 
 	@Override
-	public void deflect(SpriteBatch batch) {
-		// TODO Auto-generated method stub
+	public void deflect(SpriteBatch batch)
+	{
+		batch.draw(this.deflecting, getFacingRight() ? getPosX() : getPosX()+64,getPosY(), getFacingRight() ? 64 : -64, 64);
 		
 	}
 
@@ -295,10 +314,6 @@ public class CharacterBoss extends Character
 		return true;
 	}
 
-	public void blockOrDeflect (CharacterState CharacterState)
-	{
-
-	}
 
 	@Override
 	public void blockOrDeflect() {
@@ -310,7 +325,7 @@ public class CharacterBoss extends Character
 	{
 		if (attackInCooldown == true) return;
 		int ran = ThreadLocalRandom.current().nextInt(1, 101);
-		if(ran > 50)
+		if(ran > 40)
 		{
 			// Rolear dado para Mele o Distancia
 			int ranA = ThreadLocalRandom.current().nextInt(1,2);
@@ -318,10 +333,22 @@ public class CharacterBoss extends Character
 			{
 				this.setCharacterState(CharacterState.attacking); // Attacks
 				currentAttack = ThreadLocalRandom.current().nextInt(0, this.attacksList.size());
+				while (!(attacksList.get(currentAttack) instanceof AttackPattern))
+				{
+					currentAttack = ThreadLocalRandom.current().nextInt(0, this.attacksList.size());
+				}
 				attackInCooldown = true;
 			}
-				
-			//else Ranged Attack
+			else
+			{
+				this.setCharacterState(CharacterState.attacking); // Attacks
+				currentAttack = ThreadLocalRandom.current().nextInt(0, this.attacksList.size());
+				while (!(attacksList.get(currentAttack) instanceof RangedAttackPattern))
+				{
+					currentAttack = ThreadLocalRandom.current().nextInt(0, this.attacksList.size());
+				}
+				attackInCooldown = true;
+			}
 		}
 		else if(ran > 30) // Moves
 		{
@@ -353,6 +380,7 @@ public class CharacterBoss extends Character
 		attackHitbox.x = getFacingRight() ? getPosX() + getAttackHitbox().width : getPosX() - getAttackHitbox().width;
 		attackHitbox.y = getPosY();
 	}
+	//amogus
 	@Override
 	public Rectangle createHitbox(float x, float y)
 	{

@@ -13,6 +13,7 @@ public class BossData
 {
 	private String name;	//nombre
 	private Texture idle;	//sprite que tendrá en estado idle
+	private Texture deflecting;
 	private int hp;			//la vida que tendrá
 	private int damage;
 	private int amountAttacks;	//la cantidad de ataques que tendrá
@@ -28,16 +29,17 @@ public class BossData
 		switch (code)
 		{
 			case 1:
-				//{framesDeDuracion,fasesAtaque(N)(siempre es par),frame1,...,frameN}
-				int [][] auxAttackPatternData1 = {{50,2,32,34}};
+				//{tipo,framesDeDuracion,fasesAtaque(N),frame1,...,frameN}
+				int [][] auxAttackPatternData1 = {{1,50,2,32,34},{2,30,1,29}};
 				//{{dimX1,dimY1},...,{dimXN,dimYN}}
-				int [][][] auxAttackPatternHitbox1 = {{{40,20},{100,50}}};
+				int [][][] auxAttackPatternHitbox1 = {{{60,40}}};
 				//{SpriteMap,DimensionX,DimensionY,tiempoDuracionPorFrame}
-				Object[][] auxAttackAnimationData1 = {{"reisenAttackKick.png",64,64,6,0.11f}};
+				Object[][] auxAttackAnimationData1 = {{"reisenAttackKick.png",64,64,6,0.11f},{"reisenShooting.png",64,64,3,0.14f}};
 				this.name = "Miriam";
-				this.idle = new Texture(Gdx.files.internal("MiriamIdleAnim_0.png"));
-				this.hp = 10;
-				this.amountAttacks = 1;
+				this.idle = new Texture(Gdx.files.internal("reisenIdle.png"));
+				this.setDeflecting(new Texture(Gdx.files.internal("reisenDeflecting.png")));
+				this.hp = 70;
+				this.amountAttacks = 2;
 				this.attackPatternData = auxAttackPatternData1;
 				this.attackAnimationData = auxAttackAnimationData1;
 				this.attackPatternHitboxData = auxAttackPatternHitbox1;
@@ -46,14 +48,14 @@ public class BossData
 				break;
 			case 2:
 				//{framesDeDuracion,fasesAtaque(N)(siempre es par),frame1,...,frameN}
-				int [][] auxAttackPatternData2 = {{50,2,32,34}};
+				int [][] auxAttackPatternData2 = {{1,50,2,32,34},{2,30,1,29}};
 				//{{dimX1,dimY1},...,{dimXN,dimYN}}
-				int [][][] auxAttackPatternHitbox2 = {{{40,20},{100,50}}};
+				int [][][] auxAttackPatternHitbox2 = {{{60,40}}};
 				//{SpriteMap,DimensionX,DimensionY,tiempoDuracionPorFrame}
-				Object[][] auxAttackAnimationData2 = {{"reisenAttackKick.png",64,64,6,0.11f}};
+				Object[][] auxAttackAnimationData2 = {{"reisenAttackKick.png",64,64,6,0.11f},{"reisenShooting.png",64,64,3,0.14f}};
 				this.name = "Miriam's Ghost";
 				this.idle = new Texture(Gdx.files.internal("MiriamIdleAnim_0.png"));
-				this.hp = 10;
+				this.hp = 100;
 				this.amountAttacks = 1;
 				this.attackPatternData = auxAttackPatternData2;
 				this.attackAnimationData = auxAttackAnimationData2;
@@ -96,7 +98,7 @@ public class BossData
 		auxTexture = new Texture("reisenWalking.png");
 		TextureRegion[][] tmpFrames = TextureRegion.split(auxTexture, 64, 64);
 
-		auxAnimationFrames = new TextureRegion[14];
+		auxAnimationFrames = new TextureRegion[11];
 		for (int index = 0; index < 11; index += 1)
 		{
 			auxAnimationFrames[index] = tmpFrames[0][index];
@@ -118,24 +120,40 @@ public class BossData
 		ArrayList<IAttack> attackPatternList = new ArrayList<IAttack>();
 		for (int cont = 0; cont < amountAttacks; cont += 1)
 		{
-			int timerDefault = attackPatternData[cont][0];
-			int length = attackPatternData[cont][1];
-			int[] Timers = new int[length];
-			for (int index = 0; index < length; index += 1)
+			if (attackPatternData[cont][0] == 1)
 			{
-				Timers[index] = attackPatternData[cont][index+2];
+				int timerDefault = attackPatternData[cont][1];
+				int length = attackPatternData[cont][2];
+				int[] Timers = new int[length];
+				for (int index = 0; index < length; index += 1)
+				{
+					Timers[index] = attackPatternData[cont][index+3];
+				}
+				
+				//[attackNumber][attackPhase][dimX || dimY]
+				//{ {  {64,64} , {100,100}  } , {  {64,64} , {100,100} , {150,150}  } }
+				Rectangle[] hitboxList = new Rectangle[length/2];
+				for (int attackPhase = 0; attackPhase < (length/2); attackPhase += 1)
+				{
+					hitboxList[attackPhase] = setHitbox(attackPatternHitboxData[cont][attackPhase][0],attackPatternHitboxData[cont][attackPhase][1]);
+				}
+				
+				AttackPattern attack = new AttackPattern(timerDefault,Timers,hitboxList);
+				attackPatternList.add(attack);
 			}
-			
-			//[attackNumber][attackPhase][dimX || dimY]
-			//{ {  {64,64} , {100,100}  } , {  {64,64} , {100,100} , {150,150}  } }
-			Rectangle[] hitboxList = new Rectangle[length/2];
-			for (int attackPhase = 0; attackPhase < (length/2); attackPhase += 1)
+			else
 			{
-				hitboxList[attackPhase] = setHitbox(attackPatternHitboxData[cont][attackPhase][0],attackPatternHitboxData[cont][attackPhase][1]);
+				int timerDefault = attackPatternData[cont][1];
+				int length = attackPatternData[cont][2];
+				int[] Timers = new int[length];
+				for (int index = 0; index < length; index += 1)
+				{
+					Timers[index] = attackPatternData[cont][index+3];
+				}
+				
+				RangedAttackPattern attack = new RangedAttackPattern(timerDefault, Timers);
+				attackPatternList.add(attack);
 			}
-			
-			AttackPattern attack = new AttackPattern(timerDefault,Timers,hitboxList);
-			attackPatternList.add(attack);
 		}
 		
 		return attackPatternList;
@@ -173,5 +191,13 @@ public class BossData
 	}
 	public Animation<TextureRegion> getWalkingAnimation() {
 		return walkingAnimation;
+	}
+
+	public Texture getDeflecting() {
+		return deflecting;
+	}
+
+	public void setDeflecting(Texture deflecting) {
+		this.deflecting = deflecting;
 	}
 }

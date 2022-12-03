@@ -26,7 +26,7 @@ public class CharacterBuilder
 	private Sound succesfulDeflectSound = Gdx.audio.newSound(Gdx.files.internal("DeflectSound00.wav"));
 	
 	private String name = "Youmu";
-	private int health = 6;
+	private int health = 200;
 	private Team team = Team.Player;
 	private boolean canTakeKnockback = true;
 	
