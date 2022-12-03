@@ -35,6 +35,7 @@ public class MoveSine implements IMovement
         IncreaseCurrent();
     }
     
+    @Override
     public void continueMoving(Rectangle hitbox)
     {
         

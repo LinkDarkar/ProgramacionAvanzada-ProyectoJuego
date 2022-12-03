@@ -10,6 +10,7 @@ public class Screen_Menu extends ScreenBase {
 		setInstance(this);
 	}
 	
+	@Override
 	public void ManageFont()
 	{
 		String str;
@@ -32,6 +33,7 @@ public class Screen_Menu extends ScreenBase {
 		drawText(str, getHorizontalCenterForText(str), getCameraHeight()/2-120);
 	}
 	
+	@Override
 	public void CheckInputs()
 	{
 		//if (Gdx.input.isTouched() || Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {

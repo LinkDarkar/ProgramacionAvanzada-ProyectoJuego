@@ -175,6 +175,7 @@ public abstract class Character extends Entity
 	{
 		return this.getAttackHitbox().overlaps(affectedHitbox);
 	}
+	@Override
 	public void collisionHit (Character characterAggresor)
 	{
 		if (this.getTeam() == characterAggresor.getTeam()) return;
@@ -225,6 +226,7 @@ public abstract class Character extends Entity
 		//System.out.println("KB: "+knockbackCount);
 	}
 	
+	@Override
 	public void takeDamage (int damageReceived)
 	{
 		takeDamage(damageReceived, 0);
@@ -261,6 +263,7 @@ public abstract class Character extends Entity
 		}
 	}
 	
+	@Override
 	public boolean renderFrame (SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
 		if (getHealth() <= 0 || entitiesList == null || entitiesList.size() < 1) return false;

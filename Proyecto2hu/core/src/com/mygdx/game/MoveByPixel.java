@@ -15,6 +15,7 @@ public class MoveByPixel implements IMovement{
 		hitbox.x += vel * Gdx.graphics.getDeltaTime();
 	}
 
+	@Override
 	public void continueMoving(Rectangle hitbox)
 	{
 		

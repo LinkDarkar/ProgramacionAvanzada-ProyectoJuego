@@ -16,6 +16,7 @@ public class MoveVectorial implements IMovement {
 		if (currentSpeed < 10) currentSpeed += vel;
 	}
 	
+	@Override
 	public void continueMoving(Rectangle hitbox)
 	{
 		hitbox.x += currentSpeed * 0.2f * Gdx.graphics.getDeltaTime();

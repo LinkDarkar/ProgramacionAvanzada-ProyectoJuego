@@ -46,6 +46,7 @@ public class CharacterBoss extends Character
 		this.walkingAnimation = data.getWalkingAnimation();
 		this.deflecting = data.getDeflecting();
 	}
+	@Override
 	public void createAttackHitbox()
 	{
 		Rectangle attackHitbox = new Rectangle();
@@ -147,6 +148,7 @@ public class CharacterBoss extends Character
 		}
 	}
 
+	@Override
 	public void collisionHit (Character characterAggresor)
 	{
 		if (this.getTeam() == characterAggresor.getTeam()) return;
@@ -195,6 +197,7 @@ public class CharacterBoss extends Character
 		return hitbox;
 	}
 
+	@Override
 	public void attack(SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{		switch(attacksList.get(currentAttack).attack())
 		{

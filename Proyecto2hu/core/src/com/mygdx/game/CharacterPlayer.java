@@ -75,6 +75,7 @@ public class CharacterPlayer extends Character
 		return hitbox;
 	}
 
+	@Override
 	public void createAttackHitbox()
 	{
 		Rectangle attackHitbox = new Rectangle();
@@ -160,6 +161,7 @@ public class CharacterPlayer extends Character
 	}
 
 //Control de animaciones y estados
+	@Override
 	public void attack(SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
 		if (attackMovementTimer < attackMovementTimerDefault)
@@ -190,7 +192,8 @@ public class CharacterPlayer extends Character
 			attackMovementTimer = 0;
 		}
 	}
-
+	
+	@Override
 	public void deflect(SpriteBatch batch)
 	{
 		if (deflectTime < deflectTimeDefault)
@@ -212,6 +215,7 @@ public class CharacterPlayer extends Character
 		}
 	}
 
+	@Override
 	public void dashing(SpriteBatch batch)
 	{
 		if (dashTime < dashTimeDefault)
@@ -227,7 +231,8 @@ public class CharacterPlayer extends Character
 			dashTime = 0;
 		}
 	}
-
+	
+	@Override
 	public void walking(SpriteBatch batch)
 	{
 		if (getFacingRight() == true)
@@ -309,6 +314,7 @@ public class CharacterPlayer extends Character
 
 	}
 
+	@Override
 	public void changeAttackHitboxPosition(Rectangle attackHitbox)
 	{
 		attackHitbox.x = getFacingRight() ? getPosX() + 50 : getPosX() - 50;

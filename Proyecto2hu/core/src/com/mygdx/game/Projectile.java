@@ -65,7 +65,7 @@ public class Projectile extends Entity
 		return hitbox;
 	}
 
-	//@Override
+	@Override
 	public boolean renderFrame(SpriteBatch batch, ArrayList<Entity> entitiesList)
 	{
 		if (aliveTime <= 0 || getHealth() <= 0)

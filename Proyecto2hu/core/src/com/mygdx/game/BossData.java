@@ -34,7 +34,7 @@ public class BossData
 				//{{dimX1,dimY1},...,{dimXN,dimYN}}
 				int [][][] auxAttackPatternHitbox1 = {{{60,40}}};
 				//{SpriteMap,DimensionX,DimensionY,tiempoDuracionPorFrame}
-				Object[][] auxAttackAnimationData1 = {{"reisenAttackKick.png",64,64,6,0.11f},{"reisenShooting.png",64,64,3,0.14f}};
+				Object[][] auxAttackAnimationData1 = {{"reisenAttackKick.png",64,64,6,0.11f},{"reisenShooting.png",64,64,3,0.10f}};
 				this.name = "Miriam";
 				this.idle = new Texture(Gdx.files.internal("reisenIdle.png"));
 				this.setDeflecting(new Texture(Gdx.files.internal("reisenDeflecting.png")));
