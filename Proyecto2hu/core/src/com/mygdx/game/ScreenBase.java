@@ -12,8 +12,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class ScreenBase implements Screen {
-	private static ScreenBase Instance;
-	final Proyecto2hu game;
+	protected static ScreenBase Instance;
+	private Proyecto2hu game;
 	private SpriteBatch batch;
 	private BitmapFont font;
 	private OrthographicCamera camera;
@@ -24,7 +24,6 @@ public class ScreenBase implements Screen {
 
 	// Se ejecuta siempre que se llege a esta pantalla
 	public ScreenBase(Proyecto2hu game) {
-		if (Instance == null) Instance = this;
 		this.game = game;
 		this.batch = game.getBatch();
 		this.font = game.getFont();
@@ -34,13 +33,18 @@ public class ScreenBase implements Screen {
 		viewport = new ExtendViewport(800,480,camera);
 		listOfEntities = new ArrayList<Entity>();
 	}
-	public static ScreenBase getInstance()
+	public static ScreenBase getInstance(Proyecto2hu game)
 	{
+		if (Instance == null) Instance = new ScreenBase(game);
 		return Instance;
 	}
-	protected void setInstance(ScreenBase instance)
+	protected void updateInstance(ScreenBase instance)
 	{
 		Instance = instance;
+	}
+	public void changeScreen(Screen screen)
+	{
+		game.setScreen(screen);
 	}
 	public SpriteBatch getBatch() {
 		return batch;

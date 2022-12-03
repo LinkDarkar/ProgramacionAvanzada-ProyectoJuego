@@ -17,7 +17,7 @@ public class Screen_Fight_2 extends ScreenBase {
 	public Screen_Fight_2(Proyecto2hu game)
 	{
 		super(game);
-		setInstance(this);
+		updateInstance(this);
 		int startingOffset = 200;
 
 		// Creates a Player Entity
@@ -28,7 +28,7 @@ public class Screen_Fight_2 extends ScreenBase {
 		addEntity(player);
 
 
-		enemy = new CharacterBoss(new BossData(2), 800, 20);
+		enemy = new CharacterBoss(new BossData(2), 800, 20, getGame());
 		enemy.setFoe(player);
 		spawnAt(enemy, startingOffset, startingHeight, true);
 		addEntity(enemy);
@@ -92,7 +92,7 @@ public class Screen_Fight_2 extends ScreenBase {
 			System.out.println("Saliendo... "+(int)returningCount);
 			if (returningCount <= 0)
 			{
-				game.setScreen(new Screen_Menu(game));
+				changeScreen(new Screen_Menu(getGame()));
 				dispose();
 			}
 		}
@@ -154,5 +154,10 @@ public class Screen_Fight_2 extends ScreenBase {
 		newObject = new BreakableObject(new Texture("Candelabro_1.png"), 1, 0, startingHeight);
 		newObject.moveTo(getPositionFromRightForEntity(newObject) - 300, startingHeight);
 		listOfEntities.add(newObject);
+	}
+	public static ScreenBase getInstance(Proyecto2hu game)
+	{
+		if (Instance == null) Instance = new Screen_Fight_2(game);
+		return Instance;
 	}
 }

@@ -38,7 +38,7 @@ public class BossData
 				this.name = "Miriam";
 				this.idle = new Texture(Gdx.files.internal("reisenIdle.png"));
 				this.setDeflecting(new Texture(Gdx.files.internal("reisenDeflecting.png")));
-				this.hp = 70;
+				this.hp = 10;
 				this.amountAttacks = 2;
 				this.attackPatternData = auxAttackPatternData1;
 				this.attackAnimationData = auxAttackAnimationData1;
@@ -54,9 +54,10 @@ public class BossData
 				//{SpriteMap,DimensionX,DimensionY,tiempoDuracionPorFrame}
 				Object[][] auxAttackAnimationData2 = {{"reisenAttackKick.png",64,64,6,0.11f},{"reisenShooting.png",64,64,3,0.14f}};
 				this.name = "Miriam's Ghost";
-				this.idle = new Texture(Gdx.files.internal("MiriamIdleAnim_0.png"));
-				this.hp = 100;
-				this.amountAttacks = 1;
+				this.idle = new Texture(Gdx.files.internal("reisenIdle.png"));
+				this.setDeflecting(new Texture(Gdx.files.internal("reisenDeflecting.png")));
+				this.hp = 15;
+				this.amountAttacks = 2;
 				this.attackPatternData = auxAttackPatternData2;
 				this.attackAnimationData = auxAttackAnimationData2;
 				this.attackPatternHitboxData = auxAttackPatternHitbox2;

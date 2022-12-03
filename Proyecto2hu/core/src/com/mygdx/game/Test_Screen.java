@@ -21,7 +21,7 @@ public class Test_Screen extends ScreenBase {
 	public Test_Screen(Proyecto2hu game)
 	{
 		super(game);
-		setInstance(this);
+		updateInstance(this);
 		int startingOffset = 200;
 		//Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("00046.wav"));
 		//Sound deflectingSound  = Gdx.audio.newSound(Gdx.files.internal("00042.wav"));
@@ -41,7 +41,7 @@ public class Test_Screen extends ScreenBase {
 		//player2.getHitbox().x = 100;
 		//player2.getHitbox().y = 100;
 
-		enemy = new CharacterBoss(new BossData(1), 800, 20);
+		enemy = new CharacterBoss(new BossData(1), 800, 20, getGame());
 		
 		enemy.setFoe(player);
 
@@ -172,7 +172,7 @@ public class Test_Screen extends ScreenBase {
 			System.out.println("Saliendo... "+(int)returningCount);
 			if (returningCount <= 0)
 			{
-				game.setScreen(new Screen_Menu(game));
+				changeScreen(new Screen_Menu(getGame()));
 				dispose();
 			}
 		}
@@ -188,5 +188,10 @@ public class Test_Screen extends ScreenBase {
 	public void createProjectile()
 	{
 		// Crea el projectil y lo agrega a la lista
+	}
+	public static ScreenBase getInstance(Proyecto2hu game)
+	{
+		if (Instance == null) Instance = new Test_Screen(game);
+		return Instance;
 	}
 }

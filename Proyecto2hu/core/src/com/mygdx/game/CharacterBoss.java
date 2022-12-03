@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public class CharacterBoss extends Character
 {	
+	private Proyecto2hu game;
 	private Entity currentFoe;
 	private float stateTime = 0f;
 	/* variables que controlan los ataques
@@ -36,7 +37,7 @@ public class CharacterBoss extends Character
 	private Texture deflecting;
 	private float contador = 0;
 
-	public CharacterBoss (BossData data, float initialPosX, float initialPosY)
+	public CharacterBoss (BossData data, float initialPosX, float initialPosY, Proyecto2hu game)
 	{
 		super(data.getIdle(), data.getName(), data.getHp(), data.getDamage(), false, null, initialPosX,initialPosY);
 		this.attackAnimation = data.importAttackAnimations();
@@ -45,6 +46,7 @@ public class CharacterBoss extends Character
 		this.setXvel(100);
 		this.walkingAnimation = data.getWalkingAnimation();
 		this.deflecting = data.getDeflecting();
+		this.game = game;
 	}
 	@Override
 	public void createAttackHitbox()
@@ -84,7 +86,7 @@ public class CharacterBoss extends Character
 				this.getPosX()+(this.getHitboxWidth()/2),
 				this.getPosY()+(this.getHitboxHeight()/2)
 			);
-			ScreenBase.getInstance().addEntity(proyectilTest);
+			ScreenBase.getInstance(game).addEntity(proyectilTest);
 			System.out.println("equipo proyectil = "+ proyectilTest.getTeam());
 		}
 		if(Gdx.input.isKeyJustPressed(Input.Keys.P) && attackInCooldown == false)
@@ -237,7 +239,7 @@ public class CharacterBoss extends Character
 							this.getPosX()+(this.getHitboxWidth()/2),
 							this.getPosY()+(this.getHitboxHeight()/2)
 						);
-						ScreenBase.getInstance().addEntity(proyectilTest);
+						ScreenBase.getInstance(game).addEntity(proyectilTest);
 					setChargingAttack(false);
 				}
 				break;

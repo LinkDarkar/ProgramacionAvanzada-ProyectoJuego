@@ -17,7 +17,7 @@ public class Screen_Fight_1 extends ScreenBase {
 	public Screen_Fight_1(Proyecto2hu game)
 	{
 		super(game);
-		setInstance(this);
+		updateInstance(this);
 		int startingOffset = 200;
 
 		// Creates a Player Entity
@@ -28,7 +28,7 @@ public class Screen_Fight_1 extends ScreenBase {
 		addEntity(player);
 
 
-		enemy = new CharacterBoss(new BossData(1), 800, 20);
+		enemy = new CharacterBoss(new BossData(1), 800, 20, getGame());
 		enemy.setFoe(player);
 		spawnAt(enemy, startingOffset, startingHeight, true);
 		addEntity(enemy);
@@ -70,11 +70,16 @@ public class Screen_Fight_1 extends ScreenBase {
 		String exitingString =  "Saliendo en "+ Math.floor(returningCount * 10) / 10+"...";
 		if (returningCount < 3) drawText(exitingString, getHorizontalCenterForText(exitingString), getVerticalCenterForText(exitingString));
 
+		setTextScale(3,3);
+		
+		if (player.getHealth() <= 0 || enemy.getHealth() <= 0)
+		{
+			String gameOver = (player.getHealth() <= 0) ? "You are dead..." : "You survived for one more fight";
+			drawText(gameOver, getHorizontalCenterForText(gameOver), getVerticalCenterForText(gameOver) - 40);
+		}
+
 		timeCounter += Gdx.graphics.getDeltaTime();
 		String str = Integer.toString((int)timeCounter%600000000);
-
-		setTextScale(3,3);
-
 		drawText(str, getHorizontalCenterForText(str), 450);
 	}
 
@@ -92,7 +97,7 @@ public class Screen_Fight_1 extends ScreenBase {
 			System.out.println("Saliendo... "+(int)returningCount);
 			if (returningCount <= 0)
 			{
-				game.setScreen(new Screen_Menu(game));
+				changeScreen(new Screen_Menu(getGame()));
 				dispose();
 			}
 		}
@@ -130,5 +135,10 @@ public class Screen_Fight_1 extends ScreenBase {
 		newObject = new BreakableObject(new Texture("Candelabro_1.png"), 1, 0, startingHeight);
 		newObject.moveTo(getPositionFromRightForEntity(newObject), startingHeight);
 		listOfEntities.add(newObject);
+	}
+	public static ScreenBase getInstance(Proyecto2hu game)
+	{
+		if (Instance == null) Instance = new Screen_Fight_1(game);
+		return Instance;
 	}
 }

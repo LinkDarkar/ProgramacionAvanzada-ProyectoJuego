@@ -7,7 +7,7 @@ public class Screen_Menu extends ScreenBase {
 	// Se ejecuta siempre que se llege a esta pantalla
 	public Screen_Menu(Proyecto2hu game) {
 		super(game);
-		setInstance(this);
+		updateInstance(this);
 	}
 	
 	@Override
@@ -38,11 +38,16 @@ public class Screen_Menu extends ScreenBase {
 	{
 		//if (Gdx.input.isTouched() || Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
 		if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
-			if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) game.setScreen(new Test_Screen(game));
-			if (Gdx.input.isKeyPressed(Input.Keys.NUM_1) || Gdx.input.isKeyPressed(Input.Keys.NUMPAD_1)) game.setScreen(new Screen_Fight_1(game));
-			if (Gdx.input.isKeyPressed(Input.Keys.NUM_2) || Gdx.input.isKeyPressed(Input.Keys.NUMPAD_2)) game.setScreen(new Screen_Fight_2(game));
+			if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) changeScreen(new Test_Screen(getGame()));
+			if (Gdx.input.isKeyPressed(Input.Keys.NUM_1) || Gdx.input.isKeyPressed(Input.Keys.NUMPAD_1)) changeScreen(new Screen_Fight_1(getGame()));
+			if (Gdx.input.isKeyPressed(Input.Keys.NUM_2) || Gdx.input.isKeyPressed(Input.Keys.NUMPAD_2)) changeScreen(new Screen_Fight_2(getGame()));
 			//if (Gdx.input.isKeyPressed(Input.Keys.NUM_3) || Gdx.input.isKeyPressed(Input.Keys.NUMPAD_3)) game.setScreen(new Screen_Fight_3(game));
 			dispose();
 		}
+	}
+	public static ScreenBase getInstance(Proyecto2hu game)
+	{
+		if (Instance == null) Instance = new Screen_Menu(game);
+		return Instance;
 	}
 }
